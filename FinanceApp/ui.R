@@ -50,8 +50,8 @@ shinyUI(
                     hr(),
                     
                     # Conditional Panel for House Hold Income
-                    menuItem('House Hold Income',
-                             tabName = 'householdIncomeTab',
+                    menuItem('Parameters',
+                             tabName = 'ParametersTab',
                              icon = icon('users'),
                              selectInput(
                                inputId = "household_count",
@@ -64,11 +64,14 @@ shinyUI(
                                condition = "input.household_count == 'One Person'",
                                
                                # Inputs for One Person Household
-                               selectInput(
+                               numericInput(
                                  inputId = "Person_1_age",          
                                  label = "Enter Age:",
-                                 choices = c("18", "19", "20", "21", "22"),  # Example choices
-                                 selected = "18"
+                                 value = 21,
+                                 min = 18,
+                                 max = 120, 
+                                 step = 1,
+                                 width = NA
                                ),
                                
                                # Add other inputs for One Person Household as needed
@@ -78,18 +81,24 @@ shinyUI(
                                condition = "input.household_count == 'Two Person'",
                                
                                # Inputs for Two Person Household
-                               selectInput(
+                               numericInput(
                                  inputId = "Person_1_age",          
                                  label = "Enter Person 1 Age:",
-                                 choices = c("18", "19", "20", "21", "22"),  # Example choices
-                                 selected = "18"
+                                 value = 21,
+                                 min = 18,
+                                 max = 120, 
+                                 step = 1, 
+                                 width = NA
                                ),
                                
-                               selectInput(
+                               numericInput(
                                  inputId = "Person_2_age",          
                                  label = "Enter Person 2 Age:",
-                                 choices = c("18", "19", "20", "21", "22"),  # Example choices
-                                 selected = "18"
+                                 value = 23,
+                                 min = 18,
+                                 max = 120, 
+                                 step = 1, 
+                                 width = NA
                                ),
                                
                                # Add other inputs for Two Person Household as needed
