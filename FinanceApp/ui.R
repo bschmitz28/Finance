@@ -31,6 +31,15 @@ shinyUI(
                           Shiny.onInputChange('SideBar_col_react', Math.random())
                         });"
                     ),
+                    tags$head(
+                      tags$style(HTML(
+                      ".skin-black .sidebar-menu > li.active > a,
+                      .skin-black .sidebar-menu > li:hover > a
+                      {
+                        border-left-color: #5f939a;
+                        background-color: #5f939a;
+                      }"
+                    ))),
                     menuItem(
                       'Budget Quick Look',
                       tabName = 'budgetTab',
