@@ -166,13 +166,13 @@ shinyUI(
         tabItem(
           tabName = 'retirementTab',
           h2('Retirement Analysis'),
-          textOutput("limit_401k_display"),
-          textOutput("limit_roth_ira_display"),
-          textOutput("limit_roth_ira_catchup_display"),
-          textOutput("limit_hsa_one_display"),
-          textOutput("limit_hsa_two_display"),
-          textOutput("limit_hsa_one_55_display"),
-          textOutput("limit_hsa_two_55_display"),
+          # textOutput("limit_401k_display"),
+          # textOutput("limit_roth_ira_display"),
+          # textOutput("limit_roth_ira_catchup_display"),
+          # textOutput("limit_hsa_one_display"),
+          # textOutput("limit_hsa_two_display"),
+          # textOutput("limit_hsa_one_55_display"),
+          # textOutput("limit_hsa_two_55_display"),
           
           # Inputs for Retirement Analysis
           # Inputs for Person 1
@@ -205,7 +205,7 @@ shinyUI(
                      label = "Enter Person 1 Employee Contributions $:",
                      value = 10000,
                      min = 0,
-                     max = lim401k50,
+                     max = calculate_limits(75)$lim401k50,
                      step = 1,
                      width = NA
                    )
@@ -227,7 +227,7 @@ shinyUI(
                      label = "Enter Annual Roth Contrib $:",
                      value = 3000,
                      min = 0,
-                     max = limrothira50,
+                     max = calculate_limits(75)$limrothira50,
                      step = .1,
                      width = NA
                    )
@@ -238,7 +238,7 @@ shinyUI(
                      label = "Enter Annual HSA Contrib $ (Person 1):",
                      value = 0,
                      min = 0,
-                     max = limhsaone55,
+                     max = calculate_limits(75)$limhsaone55,
                      step = .1,
                      width = NA
                    )
@@ -288,7 +288,7 @@ shinyUI(
                        label = "Enter Person 2 Employee Contributions $:",
                        value = 10000,
                        min = 0,
-                       max = lim401k50,
+                       max = calculate_limits(75)$lim401k50,
                        step = 1,
                        width = NA
                      )
@@ -310,7 +310,7 @@ shinyUI(
                        label = "Enter Annual Roth Contrib $ (Person 2):",
                        value = 3000,
                        min = 0,
-                       max = limrothira50,
+                       max = calculate_limits(75)$limrothira50,
                        step = .1,
                        width = NA
                      )
@@ -321,7 +321,7 @@ shinyUI(
                        label = "Enter Annual HSA Contrib $ (Person 2):",
                        value = 0,
                        min = 0,
-                       max = limhsatwo55,
+                       max = calculate_limits(75)$limhsatwo55,
                        step = .1,
                        width = NA
                      )
@@ -335,10 +335,19 @@ shinyUI(
                        max = 100,
                        step = 1,
                        width = NA
-                     )
+                     ), 
+                    
               )
             )
-          )
+          ),
+          br(),
+          textOutput("limit_401k_display"),
+          textOutput("limit_roth_ira_display"),
+          textOutput("limit_roth_ira_catchup_display"),
+          textOutput("limit_hsa_one_display"),
+          textOutput("limit_hsa_two_display"),
+          textOutput("limit_hsa_one_55_display"),
+          textOutput("limit_hsa_two_55_display")
         )
       )
     )
