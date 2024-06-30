@@ -108,22 +108,21 @@ shinyUI(
                                step = 1,
                                width = NA
                              ),
-                             
-                             numericInput(
-                               inputId = "p2_age",
-                               label = "Enter Person 2 Age:",
-                               value = 29,
-                               min = 18,
-                               max = 120,
-                               step = 1,
-                               width = NA
-                             ),
                              numericInput(
                                inputId = "p1_salary",
                                label = "Enter Person 1 Salary:",
                                value = 45000,
                                min = 1000,
                                max = 1000000,
+                               step = 1,
+                               width = NA
+                             ),
+                             numericInput(
+                               inputId = "p2_age",
+                               label = "Enter Person 2 Age:",
+                               value = 29,
+                               min = 18,
+                               max = 120,
                                step = 1,
                                width = NA
                              ),
@@ -359,16 +358,15 @@ shinyUI(
               hr(),
               fluidRow(
                 column(width = 6,
-                       textOutput("limit_401k_display"),
-                       textOutput("limit_roth_ira_display"),
-                       textOutput("limit_roth_ira_catchup_display")
+                       textOutput("limit_401k_one_display"),
+                       textOutput("limit_roth_ira_one_catchup_display"),
+                       textOutput("limit_hsa_one_55_display")
                 ),
                 column(width = 6,
-                       textOutput("limit_hsa_one_display"),
-                       textOutput("limit_hsa_two_display"),
-                       textOutput("limit_hsa_one_55_display"),
+                       textOutput("limit_401k_two_display"),
+                       textOutput("limit_roth_ira_two_catchup_display"),
                        textOutput("limit_hsa_two_55_display")
-                )
+                ),
               )
             ),
             # Retirement growth plot ----
@@ -376,7 +374,7 @@ shinyUI(
               title = strong('Growth Plot')
               # ,insert DT::dataTableOutput('retireGrowthTbl')
             ),
-            # Retirement growth plot ----
+            # Retirement growth table ----
             tabPanel(
               title = strong('Growth Table')
               # ,insert plotlyOutput('retireGrowthPlot)
