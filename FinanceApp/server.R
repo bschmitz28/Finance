@@ -31,10 +31,9 @@ function(input, output, session) {
   # Render UI outputs
   output$limit_401k_one_display <- renderText({
     if(input$household_count %in% c("One Person", "Two Person")) {
-      paste("Person 1 401k Contribution Limit: $",
-            ifelse(rv$p1_age >= 50, limits()$p1_limits$lim401k50, lim401k))
+      paste("Person 1 401k Contribution Limit: $", limits()$p1_limits$lim401k50)
     } else {
-      ""
+      input$household_count
     }
        
   })
@@ -45,8 +44,7 @@ function(input, output, session) {
   
   output$limit_roth_ira_one_catchup_display <- renderText({
     if(input$household_count %in% c("One Person", "Two Person")) {
-      paste("Person 1 Roth IRA Contribution Limit: $",
-            ifelse(rv$p1_age >= 50, limits()$p1_limits$limrothira50,limrothira))
+      paste("Person 1 Roth IRA Contribution Limit: $", limits()$p1_limits$limrothira50)
     } else {
       ""
     }
@@ -60,8 +58,7 @@ function(input, output, session) {
 
   output$limit_hsa_one_55_display <- renderText({
     if (input$household_count %in% c("One Person", "Two Person")) {
-      paste("Person 1 HSA Contribution Limit (Individual): $",
-            ifelse(rv$p1_age >= 55, limits()$p1_limits$limhsaone55, limhsa_one))
+      paste("Person 1 HSA Contribution Limit (Individual): $", limits()$p1_limits$limhsaone55)
     } else {
       ""
     }

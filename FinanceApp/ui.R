@@ -70,53 +70,30 @@ shinyUI(
                              selected = "One Person"
                            ),
                            
-                           conditionalPanel(
-                             condition = "input.household_count == 'One Person'",
-                             
-                             # Inputs for One Person Household
-                             numericInput(
-                               inputId = "p1_age",
-                               label = "Enter Age:",
-                               value = 25,
-                               min = 18,
-                               max = 120,
-                               step = 1,
-                               width = NA
-                             ),
-                             
-                             numericInput(
-                               inputId = "p1_salary",
-                               label = "Enter Salary $:",
-                               value = 45000,
-                               min = 1000,
-                               max = 1000000,
-                               step = 1,
-                               width = NA
-                             ) 
+                           #Inputs for One Person Household
+                           numericInput(
+                             inputId = "p1_age",
+                             label = "Enter Person 1 Age:",
+                             value = 26,
+                             min = 18,
+                             max = 120,
+                             step = 1,
+                             width = NA
                            ),
-                           
+                           numericInput(
+                             inputId = "p1_salary",
+                             label = "Enter Person 1 Salary:",
+                             value = 45000,
+                             min = 1000,
+                             max = 1000000,
+                             step = 1,
+                             width = NA
+                           ),
+                     
                            conditionalPanel(
                              condition = "input.household_count == 'Two Person'",
                              
                              # Inputs for Two Person Household
-                             numericInput(
-                               inputId = "p1_age",
-                               label = "Enter Person 1 Age:",
-                               value = 26,
-                               min = 18,
-                               max = 120,
-                               step = 1,
-                               width = NA
-                             ),
-                             numericInput(
-                               inputId = "p1_salary",
-                               label = "Enter Person 1 Salary:",
-                               value = 45000,
-                               min = 1000,
-                               max = 1000000,
-                               step = 1,
-                               width = NA
-                             ),
                              numericInput(
                                inputId = "p2_age",
                                label = "Enter Person 2 Age:",
