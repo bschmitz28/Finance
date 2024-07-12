@@ -73,7 +73,7 @@ shinyUI(
                            #Inputs for One Person Household
                            numericInput(
                              inputId = "p1_age",
-                             label = "Enter Person 1 Age:",
+                             label = "Person 1 Age:",
                              value = 26,
                              min = 18,
                              max = 120,
@@ -82,21 +82,21 @@ shinyUI(
                            ),
                            numericInput(
                              inputId = "p1_salary",
-                             label = "Enter Person 1 Salary:",
+                             label = "Person 1 Salary:",
                              value = 45000,
                              min = 1000,
                              max = 1000000,
                              step = 1,
                              width = NA
                            ),
-                     
+                           
                            conditionalPanel(
                              condition = "input.household_count == 'Two Person'",
                              
                              # Inputs for Two Person Household
                              numericInput(
                                inputId = "p2_age",
-                               label = "Enter Person 2 Age:",
+                               label = "Person 2 Age:",
                                value = 29,
                                min = 18,
                                max = 120,
@@ -105,7 +105,7 @@ shinyUI(
                              ),
                              numericInput(
                                inputId = "p2_salary",
-                               label = "Enter Person 2 Salary:",
+                               label = "Person 2 Salary:",
                                value = 55000,
                                min = 1000,
                                max = 1000000,
@@ -125,7 +125,8 @@ shinyUI(
       ),
       tags$style(type = 'text/css', '.modal-dialog {width: fit-content !important;}'),
       tags$style("#p1_wagegrowth-label,#p1_emp_match-label, #p1_emp_contrib-label, #p1_ratereturn-label, #p1_roth-label, #p1_hsa-label, #p1_projections-label,
-                 #p2_wagegrowth-label, #p2_emp_match-label, #p2_emp_contrib-label, #p2_ratereturn-label, #p2_roth-label, #p2_hsa-label, #p2_projections-label  {font-size: 0.75em;}"),
+                 #p2_wagegrowth-label, #p2_emp_match-label, #p2_emp_contrib-label, #p2_ratereturn-label, #p2_roth-label, #p2_hsa-label, #p2_projections-label,
+                 #p1_current401k-label, #p1_currentroth-label, #p1_currenthsa-label,#p2_current401k-label, #p2_currentroth-label, #p2_currenthsa-label {font-size: 0.75em;}"),
       
       # Tabs for 3 sections ----
       tabItems(
@@ -163,177 +164,220 @@ shinyUI(
             width = 12,
             tabPanel(
               title = strong('Inputs'),
+              # p1 column
+              
               fluidRow(
-                column(width = 3,
+                column(width = 6,
+                       infoBox("","Person One",
+                               icon = icon("user"),
+                               width = 5, 
+                               color = "light-blue"),
                        numericInput(
                          inputId = "p1_wagegrowth",
-                         label = "Enter Person 1 Wage Growth Rate %:",
+                         label = "Wage Growth Rate %:",
                          value = 3,
                          min = 0,
                          max = 100,
                          step = 0.5,
                          width = NA
-                       )
-                ),
-                column(width = 3,
+                       ),
                        numericInput(
                          inputId = "p1_emp_match",
-                         label = "Enter Person 1 Employer Matching %:",
+                         label = "Employer Matching %:",
                          value = 5,
                          min = 0,
                          max = 100,
                          step = 0.5,
                          width = NA
-                       )
-                ),
-                
-                column(width = 3,
+                       ),
                        numericInput(
                          inputId = "p1_emp_contrib",
-                         label = "Enter Person 1 Employee Contributions $:",
+                         label = "Employee Contributions $:",
                          value = 10000,
                          min = 0,
                          max = calculate_limits(75)$lim401k50,
                          step = 1,
                          width = NA
-                       )
-                )
-              ),
-              fluidRow(
-                column(width = 3,
+                       ),
                        numericInput(
                          inputId = "p1_ratereturn",
-                         label = "Enter Person 1 Rate of Return %:",
+                         label = "Rate of Return %:",
                          value = 6.5,
                          min = 0,
                          max = 1000,
                          step = .1,
                          width = NA
-                       )
-                ),
-                column(width = 3,
+                       ),
                        numericInput(
                          inputId = "p1_roth",
-                         label = "Enter Annual Roth Contrib $:",
+                         label = "Annual Roth Contrib $:",
                          value = 3000,
                          min = 0,
                          max = calculate_limits(75)$limrothira50,
                          step = .1,
                          width = NA
-                       )
-                ),
-                column(width = 3,
+                       ),
                        numericInput(
                          inputId = "p1_hsa",
-                         label = "Enter Annual HSA Contrib $ (Person 1):",
+                         label = "Annual HSA Contrib $:",
                          value = 0,
                          min = 0,
                          max = calculate_limits(75)$limhsaone55,
                          step = .1,
                          width = NA
-                       )
-                ),
-                column(width = 3,
+                       ),
                        numericInput(
                          inputId = "p1_projections",
-                         label = "Enter Person 1 Years to Project:",
+                         label = "Years to Project:",
                          value = 30,
                          min = 0,
                          max = 100,
                          step = 1,
                          width = NA
+                       ),
+                       # add in current amount 401k
+                       numericInput(
+                         inputId = "p1_current401k",
+                         label = "Current 401k Amount:",
+                         value = 10000,
+                         min = 0,
+                         max = 10000000,
+                         step = 0.1,
+                         width = NA
+                       ),
+                       # add in current amount roth 
+                       numericInput(
+                         inputId = "p1_currentroth",
+                         label = "Current Roth Amount:",
+                         value = 10000,
+                         min = 0,
+                         max = 10000000,
+                         step = 0.1,
+                         width = NA
+                       ),
+                       # add in current amount hsa
+                       numericInput(
+                         inputId = "p1_currenthsa",
+                         label = "Current HSA Amount:",
+                         value = 10000,
+                         min = 0,
+                         max = 10000000,
+                         step = 0.1,
+                         width = NA
                        )
-                )
-              ),
-              # Conditional panel for Two Person inputs
-              conditionalPanel(
-                condition = "input.household_count == 'Two Person'",
-                hr(),
-                fluidRow(
-                  column(width = 3,
+                ),
+                
+                # Column { conditional{ numeric1, numeric2, ...}}
+                
+                column(width = 6, 
+                       conditionalPanel(
+                         condition = "input.household_count == 'Two Person'",
+                         infoBox("","Person Two",
+                                 icon = icon("user-plus"),
+                                 width = 5, 
+                                 color = "teal"),
                          numericInput(
                            inputId = "p2_wagegrowth",
-                           label = "Enter Person 2 Wage Growth Rate %:",
+                           label = "Wage Growth Rate %:",
                            value = 2,
                            min = 0,
                            max = 100,
                            step = 0.5,
                            width = NA
-                         )
-                  ),
-                  column(width = 3,
+                         ),
                          numericInput(
                            inputId = "p2_emp_match",
-                           label = "Enter Person 2 Employer Matching %:",
+                           label = "Employer Matching %:",
                            value = 5,
                            min = 0,
                            max = 100,
                            step = 0.5,
                            width = NA
-                         )
-                  ),
-                  column(width = 3,
+                         ),
                          numericInput(
                            inputId = "p2_emp_contrib",
-                           label = "Enter Person 2 Employee Contribution $:",
+                           label = "Employee Contribution $:",
                            value = 10000,
                            min = 0,
                            max = calculate_limits(75)$lim401k50,
                            step = 1,
                            width = NA
-                         )
-                  )
-                ),
-                fluidRow(
-                  column(width = 3,
+                         ),
                          numericInput(
                            inputId = "p2_ratereturn",
-                           label = "Enter Person 2 Rate of Return %:",
+                           label = "Rate of Return %:",
                            value = 6.5,
                            min = 0,
                            max = 1000,
                            step = .1,
                            width = NA
-                         )
-                  ),
-                  column(width = 3,
+                         ),
                          numericInput(
                            inputId = "p2_roth",
-                           label = "Enter Annual Roth Contrib $ (Person 2):",
+                           label = "Annual Roth Contrib $:",
                            value = 3000,
                            min = 0,
                            max = calculate_limits(75)$limrothira50,
                            step = .1,
                            width = NA
-                         )
-                  ),
-                  column(width = 3,
+                         ),
                          numericInput(
                            inputId = "p2_hsa",
-                           label = "Enter Annual HSA Contrib $ (Person 2):",
+                           label = "Annual HSA Contrib $:",
                            value = 0,
                            min = 0,
                            max = calculate_limits(75)$limhsatwo55,
                            step = .1,
                            width = NA
-                         )
-                  ),
-                  column(width = 3,
+                         ),
                          numericInput(
                            inputId = "p2_projections",
-                           label = "Enter Person 2 Years to Project:",
+                           label = "Years to Project:",
                            value = 30,
                            min = 0,
                            max = 100,
                            step = 1,
                            width = NA
+                         ),
+                         # add in current amount 401k
+                         numericInput(
+                           inputId = "p2_current401k",
+                           label = "Current 401k Amount:",
+                           value = 10000,
+                           min = 0,
+                           max = 10000000,
+                           step = 0.1,
+                           width = NA
+                         ),
+                         # add in current amount roth 
+                         numericInput(
+                           inputId = "p2_currentroth",
+                           label = "Current Roth Amount:",
+                           value = 10000,
+                           min = 0,
+                           max = 10000000,
+                           step = 0.1,
+                           width = NA
+                         ),
+                         # add in current amount hsa
+                         numericInput(
+                           inputId = "p2_currenthsa",
+                           label = "Current HSA Amount:",
+                           value = 10000,
+                           min = 0,
+                           max = 10000000,
+                           step = 0.1,
+                           width = NA
                          )
-                  )
+                       )
                 )
               ),
-              # Retirement input limit outputs ----
-              hr(),
+              
+              
               fluidRow(
+                
+                # Retirement input limit outputs ----
+                hr(),
                 column(width = 6,
                        textOutput("limit_401k_one_display"),
                        textOutput("limit_roth_ira_one_catchup_display"),
@@ -343,22 +387,39 @@ shinyUI(
                        textOutput("limit_401k_two_display"),
                        textOutput("limit_roth_ira_two_catchup_display"),
                        textOutput("limit_hsa_two_55_display")
-                ),
+                )
+                
               )
-            ),
+            ), # End Tab Panel
+            
             # Retirement growth plot ----
             tabPanel(
-              title = strong('Growth Plot')
+              title = strong('Growth Plot'),
+              fluidRow(
+                column(width = 12,offset = 6,
+                       actionButton(
+                         inputId = "growthplotbtn",
+                         label= "Run Analysis")
+                )
+              )
               # ,insert DT::dataTableOutput('retireGrowthTbl')
             ),
             # Retirement growth table ----
             tabPanel(
-              title = strong('Growth Table')
-              # ,insert plotlyOutput('retireGrowthPlot)
-            )
-          ),
-        )
-      )
-    )
-  )
-)
+              title = strong('Growth Table'),
+              fluidRow(
+                column(width = 12,offset = 6,
+                       actionButton(
+                         inputId = "growthtablebtn",
+                         label= "Show Table")
+                )
+                # ,insert plotlyOutput('retireGrowthPlot)
+              )
+            ) # End of tabPanel
+          ) # End Tab Box
+        ) # End Tab Item
+      ) # End Tab Items
+    ) # End Dashboard Body
+  ) # End Dashboard Page
+) # End Shiny UI
+
