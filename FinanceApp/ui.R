@@ -124,9 +124,28 @@ shinyUI(
         tags$style(HTML("hr {border-top: 1px solid #000000;}"))
       ),
       tags$style(type = 'text/css', '.modal-dialog {width: fit-content !important;}'),
-      tags$style("#p1_wagegrowth-label,#p1_emp_match-label, #p1_emp_contrib-label, #p1_ratereturn-label, #p1_roth-label, #p1_hsa-label, #p1_projections-label,
-                 #p2_wagegrowth-label, #p2_emp_match-label, #p2_emp_contrib-label, #p2_ratereturn-label, #p2_roth-label, #p2_hsa-label, #p2_projections-label,
-                 #p1_current401k-label, #p1_currentroth-label, #p1_currenthsa-label,#p2_current401k-label, #p2_currentroth-label, #p2_currenthsa-label {font-size: 0.75em;}"),
+      tags$style(
+      "#p1_wagegrowth-label,
+      #p1_emp_match-label,
+      #p1_emp_contrib-label,
+      #p1_ratereturn-label,
+      #p1_roth-label,
+      #p1_hsa-label,
+      #p1_projections-label,
+      #p2_wagegrowth-label,
+      #p2_emp_match-label,
+      #p2_emp_contrib-label, 
+      #p2_ratereturn-label, 
+      #p2_roth-label, 
+      #p2_hsa-label, 
+      #p2_projections-label,
+      #p1_current401k-label, 
+      #p1_currentroth-label, 
+      #p1_currenthsa-label,
+      #p2_current401k-label,
+      #p2_currentroth-label,
+      #p2_currenthsa-label {font-size: 0.75em;}"
+      ),
       
       # Tabs for 3 sections ----
       tabItems(
@@ -401,8 +420,10 @@ shinyUI(
                          inputId = "growthplotbtn",
                          label= "Run Analysis")
                 )
+              ),
+              fluidRow(
+                plotlyOutput('retireGrowthPlot')
               )
-              # ,insert DT::dataTableOutput('retireGrowthTbl')
             ),
             # Retirement growth table ----
             tabPanel(
@@ -413,9 +434,11 @@ shinyUI(
                          inputId = "growthtablebtn",
                          label= "Show Table")
                 )
-                # ,insert plotlyOutput('retireGrowthPlot)
-              )
-            ) # End of tabPanel
+              ),
+              fluidRow(
+                DT::dataTableOutput('retireGrowthTbl')
+              ) 
+            ) # End of Tab Panel
           ) # End Tab Box
         ) # End Tab Item
       ) # End Tab Items
