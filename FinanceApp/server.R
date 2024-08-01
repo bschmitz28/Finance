@@ -13,32 +13,59 @@ function(input, output, session) {
   # Reactivity
   rv <- reactiveValues(
     p1_age = 0,
-    p2_age = 0
+    p2_age = 0,
+    p1_wagegrowth = 0,
+    p1_emp_contrib = 0,
+    p1_ratereturn = 0,
+    p1_roth = 0,
+    p1_hsa = 0,
+    p1_projections = 0,
+    p1_current401k = 0,
+    p1_currentroth = 0,
+    p1_currenthsa = 0,
+    p2_wagegrowth = 0,
+    p2_emp_contrib = 0,
+    p2_ratereturn = 0,
+    p2_roth = 0,
+    p2_hsa = 0,
+    p2_projections = 0,
+    p2_current401k = 0,
+    p2_currentroth = 0,
+    p2_currenthsa = 0,
+    household_count = "One Person"
   )
-
+  
   observe({
-    rv$p1_age         = input$p1_age
-    rv$p2_age         = input$p2_age
-    rv$p1_wagegrowth  = input$p1_wagegrowth
-    rv$p1_emp_match   = input$p1_emp_contrib
-    rv$p1_emp_contrib = input$p1_emp_contrib
-    rv$p1_ratereturn  = input$p1_ratereturn 
-    rv$p1_roth        = input$p1_roth
-    rv$p1_hsa         = input$p1_hsa
-    rv$p1_projections = input$p1_projections
-    rv$p1_current401k = input$p1_current401k
-    rv$p1_currentroth = input$p1_currentroth
-    rv$p1_currenthsa  = input$p1_currenthsa
-    rv$p2_wagegrowth  = input$p2_wagegrowth
-    rv$p2_emp_match   = input$p2_emp_match
-    rv$p2_emp_contrib = input$p2_emp_contrib
-    rv$p2_ratereturn  = input$p2_ratereturn
-    rv$p2_roth        = input$p2_roth
-    rv$p2_hsa         = input$p2_hsa
-    rv$p2_projections = input$p2_projections
-    rv$p2_current401k = input$p2_current401k
-    rv$p2_currentroth = input$p2_currentroth
-    rv$p2_currenthsa  = input$p2_currenthsa
+    rv$p1_age          <- input$p1_age
+    rv$p2_age          <- input$p2_age
+    rv$p1_wagegrowth   <- input$p1_wagegrowth
+    rv$p1_emp_match    <- input$p1_emp_contrib
+    rv$p1_emp_contrib  <- input$p1_emp_contrib
+    rv$p1_ratereturn   <- input$p1_ratereturn 
+    rv$p1_roth         <- input$p1_roth
+    rv$p1_hsa          <- input$p1_hsa
+    rv$p1_projections  <- input$p1_projections
+    rv$p1_current401k  <- input$p1_current401k
+    rv$p1_currentroth  <- input$p1_currentroth
+    rv$p1_currenthsa   <- input$p1_currenthsa
+    rv$p2_wagegrowth   <- input$p2_wagegrowth
+    rv$p2_emp_match    <- input$p2_emp_match
+    rv$p2_emp_contrib  <- input$p2_emp_contrib
+    rv$p2_ratereturn   <- input$p2_ratereturn
+    rv$p2_roth         <- input$p2_roth
+    rv$p2_hsa          <- input$p2_hsa
+    rv$p2_projections  <- input$p2_projections
+    rv$p2_current401k  <- input$p2_current401k
+    rv$p2_currentroth  <- input$p2_currentroth
+    rv$p2_currenthsa   <- input$p2_currenthsa
+    rv$household_count <- input$household_count
+  })
+  
+  # Reactive expression to create the dataframe based on reactive values for retirement growth
+  projected_data <- reactive({
+    retirement.growth(rv$p1_age, rv$p2_age, rv$p1_wagegrowth, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_ratereturn, rv$p1_roth, rv$p1_hsa, rv$p1_projections,
+                      rv$p1_current401k, rv$p1_currentroth, rv$p1_currenthsa, rv$p2_wagegrowth, rv$p2_emp_match, rv$p2_emp_contrib, rv$p2_ratereturn,
+                      rv$p2_roth, rv$p2_hsa, rv$p2_projections, rv$p2_current401k, rv$p2_currentroth, rv$p2_currenthsa, rv$household_count)
   })
   
   # Calculating retirement limits based on age 
@@ -49,14 +76,7 @@ function(input, output, session) {
     )
   })
   
-  # Reactive expression to create the dataframe based on reactive values for retirement growth
-  projected_data <- reactive({
-    retirement.growth(rv$p1_age, rv$p2_age, rv$p1_wagegrowth, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_ratereturn, rv$p1_roth, rv$p1_hsa, rv$p1_projections,
-                      rv$p1_current401k, rv$p1_currentroth, rv$p1_currenthsa, rv$p2_wagegrowth, rv$p2_emp_match, rv$p2_emp_contrib,rv$p2_ratereturn,
-                      rv$p2_roth, rv$p2_hsa, rv$p2_projections, rv$p2_current401k, rv$p2_currentroth, rv$p2_currenthsa
-      )
-  })
-  
+
   
   # Retirement Input Page ----
   output$limit_401k_one_display <- renderText({
@@ -65,7 +85,7 @@ function(input, output, session) {
     } else {
       input$household_count
     }
-       
+    
   })
   
   output$limit_401k_two_display <- renderText({
@@ -78,14 +98,14 @@ function(input, output, session) {
     } else {
       ""
     }
-      
+    
   })
   
   output$limit_roth_ira_two_catchup_display <- renderText({
     ifelse(input$household_count == "One Person", "", paste("Person 2 Roth IRA Contribution Limit: $", limits()$p2_limits$limrothira50))
   })
   
-
+  
   output$limit_hsa_one_55_display <- renderText({
     if (input$household_count %in% c("One Person", "Two Person")) {
       paste("Person 1 HSA Contribution Limit (Individual): $", limits()$p1_limits$limhsaone55)
@@ -97,23 +117,24 @@ function(input, output, session) {
   output$limit_hsa_two_55_display <- renderText({
     ifelse(input$household_count == "One Person", "", paste("Person 2 HSA Contribution Limit (Family): $", limits()$p2_limits$limhsatwo55))
   })
+  
+  
+  # Retirement Growth Plot ----
+  # observeEvent(input$growthplotbtn, {
+  #  output$retireGrowthPlot <- renderPlot({
+  #  ggplot(projected_data(), aes(x = Year, y = Salary)) +
+  #    geom_line() +
+  #    labs(title = "Salaryß Projection",
+  #         x = "Year",
+  #         y = "Projected Salary") +
+  #    theme_minimal()
+  #   })
+  # })
+  
+  # Retirement Growth Table ----
+  observeEvent(input$growthtablebtn, {
+    output$retireGrowthTbl <- DT::renderDataTable({
+      datatable(projected_data())
+    })
+  })
 }
-
-# Retirement Growth Plot ----
-observeEvent(input$growthplotbtn, {
-  output$retireGrowthPlot <- renderPlot({
-    # ggplot(projected_data(), aes(x = Year, y = Salary)) +
-    #   geom_line() +
-    #   labs(title = "Salary Projection",
-    #        x = "Year",
-    #        y = "Projected Salary") +
-    #   theme_minimal()
-  })
-})
-
-# Retirement Growth Table ----
-observeEvent(input$growthtablebtn, {
-  output$retireGrowthTbl <- DT::renderDataTable({
-    #datatable(projected_data())
-  })
-})
