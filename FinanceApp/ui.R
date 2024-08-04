@@ -211,7 +211,7 @@ shinyUI(
                        ),
                        numericInput(
                          inputId = "p1_emp_contrib",
-                         label = "Employee Contributions $:",
+                         label = "401k Employee Contributions $:",
                          value = 10000,
                          min = 0,
                          max = calculate_limits(75)$lim401k50,
@@ -315,7 +315,7 @@ shinyUI(
                          ),
                          numericInput(
                            inputId = "p2_emp_contrib",
-                           label = "Employee Contribution $:",
+                           label = "401k Employee Contribution $:",
                            value = 10000,
                            min = 0,
                            max = calculate_limits(75)$lim401k50,
@@ -436,7 +436,7 @@ shinyUI(
                 )
               ),
               fluidRow(
-                DT::dataTableOutput('retireGrowthTbl')
+                DT::dataTableOutput('retireGrowthTbl', height = "50em")
               ) 
             ) # End of Tab Panel
           ) # End Tab Box

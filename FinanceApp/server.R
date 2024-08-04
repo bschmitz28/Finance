@@ -23,6 +23,7 @@ function(input, output, session) {
     p1_current401k = 0,
     p1_currentroth = 0,
     p1_currenthsa = 0,
+    p1_salary = 0,
     p2_wagegrowth = 0,
     p2_emp_contrib = 0,
     p2_ratereturn = 0,
@@ -32,14 +33,15 @@ function(input, output, session) {
     p2_current401k = 0,
     p2_currentroth = 0,
     p2_currenthsa = 0,
-    household_count = "One Person"
+    p2_salary = 0,
+    household_count = "One Person",
   )
   
   observe({
     rv$p1_age          <- input$p1_age
     rv$p2_age          <- input$p2_age
     rv$p1_wagegrowth   <- input$p1_wagegrowth
-    rv$p1_emp_match    <- input$p1_emp_contrib
+    rv$p1_emp_match    <- input$p1_emp_match
     rv$p1_emp_contrib  <- input$p1_emp_contrib
     rv$p1_ratereturn   <- input$p1_ratereturn 
     rv$p1_roth         <- input$p1_roth
@@ -48,6 +50,7 @@ function(input, output, session) {
     rv$p1_current401k  <- input$p1_current401k
     rv$p1_currentroth  <- input$p1_currentroth
     rv$p1_currenthsa   <- input$p1_currenthsa
+    rv$p1_salary       <- input$p1_salary
     rv$p2_wagegrowth   <- input$p2_wagegrowth
     rv$p2_emp_match    <- input$p2_emp_match
     rv$p2_emp_contrib  <- input$p2_emp_contrib
@@ -58,14 +61,34 @@ function(input, output, session) {
     rv$p2_current401k  <- input$p2_current401k
     rv$p2_currentroth  <- input$p2_currentroth
     rv$p2_currenthsa   <- input$p2_currenthsa
+    rv$p2_salary       <- input$p2_salary
     rv$household_count <- input$household_count
   })
   
   # Reactive expression to create the dataframe based on reactive values for retirement growth
   projected_data <- reactive({
-    retirement.growth(rv$p1_age, rv$p2_age, rv$p1_wagegrowth, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_ratereturn, rv$p1_roth, rv$p1_hsa, rv$p1_projections,
-                      rv$p1_current401k, rv$p1_currentroth, rv$p1_currenthsa, rv$p2_wagegrowth, rv$p2_emp_match, rv$p2_emp_contrib, rv$p2_ratereturn,
-                      rv$p2_roth, rv$p2_hsa, rv$p2_projections, rv$p2_current401k, rv$p2_currentroth, rv$p2_currenthsa, rv$household_count)
+    
+    if(input$household_count == "One Person") {
+      
+      df <- retirement.projection(rv$p1_projections, rv$p1_current401k,  rv$p1_currentroth, rv$p1_currenthsa, rv$p1_salary, rv$p1_wagegrowth, rv$p1_ratereturn,
+                                  rv$p1_age, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_roth, rv$p1_hsa)
+      df[,3:9] <- lapply(df[,3:9], dollar,accuracy = 0.01)
+      df
+      
+    } else {
+      temp_df1 <- retirement.projection(rv$p1_projections, rv$p1_current401k,  rv$p1_currentroth, rv$p1_currenthsa, rv$p1_salary, rv$p1_wagegrowth, rv$p1_ratereturn,
+                                      rv$p1_age, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_roth, rv$p1_hsa)
+      temp_df2 <- retirement.projection(rv$p2_projections, rv$p2_current401k,  rv$p2_currentroth, rv$p2_currenthsa, rv$p2_salary, rv$p2_wagegrowth, rv$p2_ratereturn,
+                                        rv$p2_age, rv$p2_emp_match, rv$p2_emp_contrib, rv$p2_roth, rv$p2_hsa)
+      
+      names(temp_df1)[2:9] <- paste("p1_", names(temp_df1)[2:9], sep ="")
+      names(temp_df2)[2:9] <- paste("p2_", names(temp_df2)[2:9], sep ="")
+      df <- full_join(temp_df1, temp_df2, by = "Year") #need for taking larger of the two projected years in df (ie someone 24 years and someone 25)
+      df$`Total Balance` <- df$p1_Balance + df$p2_Balance
+      df[,c(3:9, 11:18)] <- lapply(df[,c(3:9, 11:18)], dollar,accuracy = 0.01)
+      df
+    }
+    
   })
   
   # Calculating retirement limits based on age 
@@ -134,7 +157,20 @@ function(input, output, session) {
   # Retirement Growth Table ----
   observeEvent(input$growthtablebtn, {
     output$retireGrowthTbl <- DT::renderDataTable({
-      datatable(projected_data())
+      if(input$household_count == "One Person") {
+        datatable(projected_data(),
+                  fillContainer = TRUE, 
+                  options = list(pageLength = 50, autoWidth = FALSE)) %>%
+          formatStyle("Balance", backgroundColor = "lightblue")
+      } else {
+        datatable(projected_data(),
+                  fillContainer = TRUE, 
+                  options = list(pageLength = 50, autoWidth = FALSE)) %>%
+          formatStyle("p1_Balance", backgroundColor = "lightblue") %>% 
+          formatStyle("p2_Balance", backgroundColor = "lightblue") %>%
+          formatStyle("Total Balance", backgroundColor = "lightyellow")
+      }
+      
     })
   })
 }

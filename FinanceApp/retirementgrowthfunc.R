@@ -8,39 +8,78 @@
 
 # retirementgrowthfunc.R
 
+retirement.growth <- function(age, wagegrowth, emp_match, emp_contrib, ratereturn, roth, hsa, current_year, 
+                              current401k, currentroth, currenthsa, salary) {
+  
+  employer_match_dollar <- emp_match * salary
+  salary <- salary * (1 + wagegrowth)
+  bal_401k <- (current401k) * (1 + ratereturn) + (employer_match_dollar + emp_contrib)
+  bal_roth <- (currentroth) * (1 + ratereturn) + (roth)
+  bal_hsa <- (currenthsa) * (1 + ratereturn) + (hsa)
+  balance <- bal_401k + bal_roth + bal_hsa #+bal_taxable
+  
+  df <- data.frame(
+    Year = current_year + 1,
+    Age = age + 1,
+    Salary = salary,
+    Employer_Contrib = employer_match_dollar,
+    Employee_Contrib = emp_contrib,
+    Roth = bal_roth,
+    HSA = bal_hsa, 
+    `401k` = bal_401k,
+    Balance = balance
+  )
+  return(df)
+}
 
-retirement.growth <- function(p1_age, p2_age, p1_wagegrowth, p1_emp_match, p1_emp_contrib, p1_ratereturn, p1_roth, p1_hsa, p1_projections, 
-                              p1_current401k, p1_currentroth, p1_currenthsa, p2_wagegrowth, p2_emp_match, p2_contrib, p2_ratereturn, 
-                              p2_roth, p2_hsa, p2_projections, p2_current401k, p2_currentroth, p2_currenthsa, household_count) {
+retirement.projection <- function(projection, starting_401k, starting_roth, starting_hsa, starting_salary,
+                                  wage_growth, rate_of_return, age, employer_match, employee_contrib, roth_contrib, hsa_contrib) {
   
-  library(scales) # Load the scales package for formatting
-  
+  wage_growth <- wage_growth/100
+  rate_of_return <- rate_of_return/100
+  employer_match <- employer_match/100
   current_year <- as.numeric(format(Sys.Date(), "%Y"))
-  years <- seq(current_year, by = 1, length.out = p1_projections)
-  p1_balance <- p1_current401k * (1 + p1_wagegrowth / 100)^(years - current_year)
   
-  if (household_count == "Two Person") {
-    if (!is.null(p2_age) && p2_age != "" && 
-        !is.null(p2_wagegrowth) && p2_wagegrowth != "" && 
-        !is.null(p2_current401k) && p2_current401k != "") {
-      
-      p2_balance <- p2_current401k * (1 + p2_wagegrowth / 100)^(years - current_year)
-      
-      df <- data.frame(
-        Year = years,
-        P1_Age = p1_age + (years - current_year),
-        P1_Balance = dollar(p1_balance, accuracy = 0.01),
-        P2_Age = p2_age + (years - current_year),
-        P2_Balance = dollar(p2_balance, accuracy = 0.01)
-      )
-    }
-  } else {
-    df <- data.frame(
-      Year = years,
-      P1_Age = p1_age + (years - current_year),
-      P1_Balance = dollar(p1_balance, accuracy = 0.01)
+  df <- data.frame(
+    Year = rep(0, projection),
+    Age = rep(0, projection),
+    Salary = rep(0, projection),
+    Employer_Contrib = rep(0, projection),
+    Employee_Contrib = rep(0, projection),
+    Roth = rep(0, projection),
+    HSA = rep(0, projection), 
+    Bal_401k = rep(0, projection),
+    Balance = rep(0, projection)
+  )
+  
+  df[1, ] <-retirement.growth(age, wage_growth, employer_match, employee_contrib, rate_of_return, roth_contrib, hsa_contrib, current_year,
+                              starting_401k, starting_roth, starting_hsa, starting_salary)
+  
+  for( i in 2:projection) {
+    df[i, ] <-retirement.growth(
+      df[i-1, "Age"],
+      wage_growth,
+      employer_match,
+      employee_contrib,
+      rate_of_return,
+      roth_contrib,
+      hsa_contrib,
+      df[i-1, "Year"],
+      df[i-1, "Bal_401k"],
+      df[i-1, "Roth"],
+      df[i-1, "HSA"],
+      df[i-1, "Salary"]
     )
   }
   
   return(df)
 }
+
+
+
+
+
+
+
+
+
