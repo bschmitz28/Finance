@@ -1,4 +1,4 @@
-# Author: Rosie Schmitz
+# Author: Rosie Schmitz & David Nita
 
 #' retirement.growth()
 #' 
@@ -52,11 +52,11 @@ retirement.projection <- function(projection, starting_401k, starting_roth, star
     Balance = rep(0, projection)
   )
   
-  df[1, ] <-retirement.growth(age, wage_growth, employer_match, employee_contrib, rate_of_return, roth_contrib, hsa_contrib, current_year,
-                              starting_401k, starting_roth, starting_hsa, starting_salary)
+  df[1, ] <- retirement.growth(age - 1, 0, employer_match, employee_contrib, rate_of_return, roth_contrib, hsa_contrib, current_year - 1,
+                              starting_401k, starting_roth, starting_hsa, starting_salary) 
   
   for( i in 2:projection) {
-    df[i, ] <-retirement.growth(
+    df[i, ] <- retirement.growth(
       df[i-1, "Age"],
       wage_growth,
       employer_match,
