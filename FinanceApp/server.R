@@ -154,11 +154,11 @@ function(input, output, session) {
         p <- ggplot(data, aes(x = Year, y = Balance, group = 1, text= paste("Year: ", Year, "<br>", 
                                                                             "Age: ", Age, "<br>",
                                                                             "Balance: ", dollar(Balance)))) +
-          geom_line(color = "blue") +
+          geom_line(color = "#c09bd5") +
           scale_y_continuous(labels = scales::dollar_format()) +
           labs(title = "Projected Balance",
                x = "Year",
-               y = "Projected Balance ($)") +
+               y = "Balance") +
           theme_minimal()
         
       } else {
@@ -180,8 +180,8 @@ function(input, output, session) {
           scale_y_continuous(labels = scales::dollar_format()) +
           labs(title = "Projected Balance",
                x = "Year",
-               y = "Projected Balance",
-               color = "Legend") +
+               y = "Balance",
+               color = "Household") +
           theme_minimal()
       }
       
