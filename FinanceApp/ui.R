@@ -429,7 +429,7 @@ shinyUI(
             tabPanel(
               title = strong('Growth Table'),
               fluidRow(
-                column(width = 12,offset = 6,
+                column(width = 12,offset = 2,
                        actionButton(
                          inputId = "growthtablebtn",
                          label= "Show Table")

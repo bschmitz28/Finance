@@ -143,16 +143,52 @@ function(input, output, session) {
   
   
   # Retirement Growth Plot ----
-  # observeEvent(input$growthplotbtn, {
-  #  output$retireGrowthPlot <- renderPlot({
-  #  ggplot(projected_data(), aes(x = Year, y = Salary)) +
-  #    geom_line() +
-  #    labs(title = "Salaryß Projection",
-  #         x = "Year",
-  #         y = "Projected Salary") +
-  #    theme_minimal()
-  #   })
-  # })
+  observeEvent(input$growthplotbtn, {
+    output$retireGrowthPlot <- renderPlotly({
+      data <- projected_data()  # Get the reactive data frame
+      
+      if (input$household_count == "One Person") {
+        # Convert Balance column to numeric on the fly
+        data <- data %>% mutate(Balance = as.numeric(gsub("[$,]", "", Balance)))
+        
+        p <- ggplot(data, aes(x = Year, y = Balance, group = 1, text= paste("Year: ", Year, "<br>", 
+                                                                            "Age: ", Age, "<br>",
+                                                                            "Balance: ", dollar(Balance)))) +
+          geom_line(color = "blue") +
+          scale_y_continuous(labels = scales::dollar_format()) +
+          labs(title = "Projected Balance",
+               x = "Year",
+               y = "Projected Balance ($)") +
+          theme_minimal()
+        
+      } else {
+        # Convert columns to numeric on the fly for two persons scenario
+        data <- data %>%
+          mutate(p1_Balance = as.numeric(gsub("[$,]", "", p1_Balance)),
+                 p2_Balance = as.numeric(gsub("[$,]", "", p2_Balance)),
+                 `Total Balance` = as.numeric(gsub("[$,]", "", `Total Balance`)))
+        
+        p <- ggplot(data, aes(x = Year)) + 
+          geom_line(aes(y = p1_Balance, color = "Person 1", group = 1, text= paste("Year: ", Year, "<br>", 
+                                                                                   "P1 Age: ", p1_Age, "<br>",
+                                                                                   "P1 Balance: ", dollar(p1_Balance)))) + 
+          geom_line(aes(y = p2_Balance, color = "Person 2", group = 1, text= paste("Year: ", Year, "<br>", 
+                                                                                   "P1 Age: ", p2_Age, "<br>",
+                                                                                   "P1 Balance: ", dollar(p2_Balance)))) + 
+          geom_line(aes(y = `Total Balance`, color = "Total", group = 1, text= paste("Year: ", Year, "<br>",
+                                                                                     "Total Balance: ", dollar(`Total Balance`)))) + 
+          scale_y_continuous(labels = scales::dollar_format()) +
+          labs(title = "Projected Balance",
+               x = "Year",
+               y = "Projected Balance",
+               color = "Legend") +
+          theme_minimal()
+      }
+      
+      ggplotly(p, tooltip = c("text"))
+    })
+  })
+  
   
   # Retirement Growth Table ----
   observeEvent(input$growthtablebtn, {
@@ -161,14 +197,16 @@ function(input, output, session) {
         datatable(projected_data(),
                   fillContainer = TRUE, 
                   options = list(pageLength = 50, autoWidth = FALSE)) %>%
-          formatStyle("Balance", backgroundColor = "lightblue")
+          formatStyle("Balance", backgroundColor = "lightblue") %>%
+          formatStyle(columns = colnames(.$x$data), `font-size` = '12px')
       } else {
         datatable(projected_data(),
                   fillContainer = TRUE, 
                   options = list(pageLength = 50, autoWidth = FALSE)) %>%
           formatStyle("p1_Balance", backgroundColor = "lightblue") %>% 
           formatStyle("p2_Balance", backgroundColor = "lightblue") %>%
-          formatStyle("Total Balance", backgroundColor = "lightyellow")
+          formatStyle("Total Balance", backgroundColor = "lightyellow") %>%
+          formatStyle(columns = colnames(.$x$data), `font-size` = '12px')
       }
       
     })
