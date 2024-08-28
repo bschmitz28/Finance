@@ -125,7 +125,7 @@ shinyUI(
       ),
       tags$style(type = 'text/css', '.modal-dialog {width: fit-content !important;}'),
       tags$style(
-      "#p1_wagegrowth-label,
+        "#p1_wagegrowth-label,
       #p1_emp_match-label,
       #p1_emp_contrib-label,
       #p1_ratereturn-label,
@@ -153,17 +153,180 @@ shinyUI(
         tabItem(
           tabName = 'budgetTab',
           h2('Budget Quick Look'),
-          "Page is Work in Progress"
-          # add info box
-        ),
+          infoBox(
+            title = "Welcome to the Finance App",
+            value = "Please use the inputs page to fill in household expenses. Next, view Budget Output to see graphs",
+            icon = icon('chart-pie'),
+            color = "blue",
+            fill = F, 
+            width = 12
+          ), # End of info box
+          
+          # Budget tab panels
+          tabBox(
+            title = "Budget",
+            width = 12,
+            tabPanel(
+              title = strong('Inputs'),
+              fluidRow(
+                column(width = 6,
+                       numericInput(
+                         inputId = "rent_mort",
+                         label = "Rent/Mortgage ($):",
+                         value = 2000,
+                         min = 0,
+                         max = 5000,
+                         step = 10,
+                         width = NA
+                       ),
+                       numericInput(
+                         inputId = "groceries",
+                         label = "Groceries ($):",
+                         value = 700,
+                         min = 0,
+                         max = 2000,
+                         step = 0.5,
+                         width = NA
+                       ),
+                       numericInput(
+                         inputId = "home_ins",
+                         label = "Home/Renters Insurance ($):",
+                         value = 50,
+                         min = 0,
+                         max = 500,
+                         step = 5,
+                         width = NA
+                       ),
+                       numericInput(
+                         inputId = "home_maint",
+                         label = "Home Maintenance ($):",
+                         value = 100,
+                         min = 0,
+                         max = 1000,
+                         step = 10,
+                         width = NA
+                       ),
+                       numericInput(
+                         inputId = "car_ins",
+                         label = "Car Insurance ($):",
+                         value = 90,
+                         min = 0,
+                         max = 500,
+                         step = 5,
+                         width = NA
+                       ),
+                       numericInput(
+                         inputId = "car_maint",
+                         label = "Car Maintenance ($):",
+                         value = 50,
+                         min = 0,
+                         max = 500,
+                         step = 5,
+                         width = NA
+                       )
+                ), # End of col 1
+                column(width = 6,
+                    numericInput(
+                      inputId = "utilities",
+                      label = "Utilities ($):",
+                      value = 150,
+                      min = 0,
+                      max = 1000,
+                      step = 10,
+                      width = NA
+                    ),
+                    numericInput(
+                      inputId = "subscriptions",
+                      label = "Subscriptions ($):",
+                      value = 50,
+                      min = 0,
+                      max = 1000,
+                      step = 5,
+                      width = NA
+                    ),
+                    numericInput(
+                      inputId = "dining_out",
+                      label = "Dining Out ($):",
+                      value = 200,
+                      min = 0,
+                      max = 2000,
+                      step = 5,
+                      width = NA
+                    ),
+                    numericInput(
+                      inputId = "hobbies",
+                      label = "Hobbies ($):",
+                      value = 200,
+                      min = 0,
+                      max = 3000,
+                      step = 5,
+                      width = NA
+                    ),
+                    numericInput(
+                      inputId = "savings",
+                      label = "Savings ($):",
+                      value = 500,
+                      min = 0,
+                      max = 10000,
+                      step = 10,
+                      width = NA
+                    ),
+                    numericInput(
+                      inputId = "investing",
+                      label = "Investing ($):",
+                      value = 300,
+                      min = 0,
+                      max = 10000,
+                      step = 10,
+                      width = NA
+                    ) # End of input
+                ) # End of col 2
+              ) # End of fluid row
+            ), # End of tab panel
+            tabPanel(
+              title = strong('Budget Analysis'),
+              fluidRow(
+                column(
+                  width = 12,
+                  offset = 5,
+                  actionButton(
+                    inputId = "budgetbtn",
+                    label = "Run Analysis"
+                  )
+                )
+              ),
+              
+              # Row for the pie chart and data table
+              fluidRow(
+                column(
+                  width = 12,
+                  plotlyOutput('budgetPieChart')
+                )
+              ),
+              
+              fluidRow(
+                column(
+                  width = 12,
+                  DT::dataTableOutput('budgetTbl')
+                ) # End of col
+              ) # End of fluid row
+            ) # End of tab panel
+          ) # End of tab box
+        ), # End tab item
         
         # Investment Breakdown Tab ----
         tabItem(
           tabName = 'investmentTab',
           h2('Investment Breakdown'),
-          "Page is Work in Progress"
-          # add info box
-        ),
+          infoBox(
+            title = "Welcome to the Finance App",
+            value = "Please use the inputs page to fill in investment paramters. Next, view Investment Output to see graphs",
+            icon = icon('chart-line'),
+            color = "purple",
+            fill = F, 
+            width = 12
+          ), # End of info box
+        ), # End of tab item
         
         # Retirement Analysis Tab ----
         tabItem(
@@ -173,6 +336,7 @@ shinyUI(
             title = "Welcome to the Finance App",
             value = "Please use the sidebar to enter number of earners in household and estimated salary per person. Next, fill out the inputs on this tab to view tax vehicle limits as well as retirement growth plot and table",
             icon = icon('comment-dollar'),
+            color = "green",
             fill = F, 
             width = 12
           ),
@@ -286,7 +450,6 @@ shinyUI(
                        )
                 ),
                 
-                # Column { conditional{ numeric1, numeric2, ...}}
                 
                 column(width = 6, 
                        conditionalPanel(

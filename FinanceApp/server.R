@@ -5,13 +5,30 @@
 # Preamble ----
 library(shiny)
 source("global.R") # Load global variables
+source("budgetfunc.R") # Computer budget outputs for pie chart and table
 source("retirementgrowthfunc.R") # Compute the retirement growth for the table and plot
 
 # Server function ----
 function(input, output, session) {
   
-  # Reactivity
+  # Reactivity ----
   rv <- reactiveValues(
+    # budget 
+    rent_mort = 0,
+    groceries = 0, 
+    home_ins = 0,
+    home_maint = 0,
+    car_ins = 0,
+    car_maint = 0,
+    utilities = 0,
+    subscriptions = 0,
+    dining_out = 0,
+    hobbies = 0,
+    savings = 0,
+    investing = 0,
+    # investment
+    
+    # retirement
     p1_age = 0,
     p2_age = 0,
     p1_wagegrowth = 0,
@@ -36,7 +53,20 @@ function(input, output, session) {
     p2_salary = 0,
     household_count = "One Person",
   )
-  
+  observe({
+    rv$rent_mort     <- input$rent_mort
+    rv$groceries     <- input$groceries
+    rv$home_ins      <- input$home_ins
+    rv$home_maint    <- input$car_maint
+    rv$car_ins       <- input$car_ins
+    rv$car_maint     <- input$car_maint
+    rv$utilities     <- input$utilities
+    rv$subscriptions <- input$subscriptions
+    rv$dining_out    <- input$dining_out
+    rv$hobbies       <- input$hobbies
+    rv$savings       <- input$savings
+    rv$investing     <- input$investing
+  })
   observe({
     rv$p1_age          <- input$p1_age
     rv$p2_age          <- input$p2_age
@@ -63,6 +93,12 @@ function(input, output, session) {
     rv$p2_currenthsa   <- input$p2_currenthsa
     rv$p2_salary       <- input$p2_salary
     rv$household_count <- input$household_count
+  })
+  
+  # Reactive expression to create dataframe based on reactive values for budget
+  budget_data <- reactive({
+    df <- budget.output(rv$rent_mort, rv$groceries, rv$home_ins, rv$home_maint, rv$car_ins, rv$car_maint, rv$utilities, rv$subscriptions, 
+                        rv$dining_out, rv$hobbies, rv$savings,  rv$investing)
   })
   
   # Reactive expression to create the dataframe based on reactive values for retirement growth
@@ -140,6 +176,49 @@ function(input, output, session) {
   output$limit_hsa_two_55_display <- renderText({
     ifelse(input$household_count == "One Person", "", paste("Person 2 HSA Contribution Limit (Family): $", limits()$p2_limits$limhsatwo55))
   })
+  
+  # Budget Pie Chart ----
+  # observeEvent(input$budgetbtn, {
+  #   output$budgetPieChart <- renderPlotly({
+  #     data <- budget_data()
+  #   })
+  # })
+  
+  # Budget Data Table ----
+  observeEvent(input$budgetbtn, {
+    output$budgetTbl <- DT::renderDataTable({
+
+          selected_data <- budget_data() %>%
+            select('Needs %', 'Wants %', 'Savings/Investing %')
+          
+          datatable(selected_data,
+                    rownames = FALSE,
+                    fillContainer = TRUE,
+                    options = list(
+                      dom = 't',
+                      rowCallback = JS(
+                        "function(row, data, index) {",
+                        "$('td', row).css('height', '50px');",  # Custom row height
+                        "}"
+                      )
+                    )
+          ) %>%
+            formatStyle(
+              'Needs %',
+              backgroundColor = styleInterval(50, c('#91cf60', '#fc8d59'))
+            ) %>%
+            formatStyle(
+              'Wants %',
+              backgroundColor = styleInterval(30, c('#91cf60', '#fc8d59'))
+            ) %>%
+            formatStyle(
+              'Savings/Investing %',
+              backgroundColor = styleInterval(20, c('#91cf60', '#fc8d59'))
+            )
+          
+        })
+      })
+      
   
   
   # Retirement Growth Plot ----
