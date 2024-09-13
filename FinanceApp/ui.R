@@ -295,15 +295,19 @@ shinyUI(
                   )
                 )
               ),
-              
+              br(),
+              br(),
               # Row for the pie chart and data table
               fluidRow(
                 column(
-                  width = 12,
+                  width = 6,
                   plotlyOutput('budgetPieChart')
-                )
-              ),
-              
+                ),
+                column(
+                  width = 6,
+                  plotlyOutput('budgetPieChart2')
+                )),
+              br(),
               fluidRow(
                 column(
                   width = 12,

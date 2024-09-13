@@ -113,7 +113,7 @@ function(input, output, session) {
       
     } else {
       temp_df1 <- retirement.projection(rv$p1_projections, rv$p1_current401k,  rv$p1_currentroth, rv$p1_currenthsa, rv$p1_salary, rv$p1_wagegrowth, rv$p1_ratereturn,
-                                      rv$p1_age, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_roth, rv$p1_hsa)
+                                        rv$p1_age, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_roth, rv$p1_hsa)
       temp_df2 <- retirement.projection(rv$p2_projections, rv$p2_current401k,  rv$p2_currentroth, rv$p2_currenthsa, rv$p2_salary, rv$p2_wagegrowth, rv$p2_ratereturn,
                                         rv$p2_age, rv$p2_emp_match, rv$p2_emp_contrib, rv$p2_roth, rv$p2_hsa)
       
@@ -135,7 +135,7 @@ function(input, output, session) {
     )
   })
   
-
+  
   
   # Retirement Input Page ----
   output$limit_401k_one_display <- renderText({
@@ -178,47 +178,97 @@ function(input, output, session) {
   })
   
   # Budget Pie Chart ----
-  # observeEvent(input$budgetbtn, {
-  #   output$budgetPieChart <- renderPlotly({
-  #     data <- budget_data()
-  #   })
-  # })
+  observeEvent(input$budgetbtn, {
+    output$budgetPieChart <- renderPlotly({
+      
+      data <- budget_data() %>%
+        #select(-c('Needs %', 'Wants %', 'Savings/Investing %', 'Needs', 'Wants', 'Savings_Investing')) %>%
+        select(c('Needs', 'Wants', 'Savings_Investing')) %>%
+        pivot_longer(everything(), 
+                     cols_vary = "slowest", 
+                     names_to = "Type") 
+      colors <- c('#fc8d62', '#8da0cb', '#66c2a5')
+      
+      fig <- plot_ly(data, labels = ~Type,
+                     values = ~value,
+                     type = 'pie',
+                     hoverinfo = 'label+text',
+                     insidetextfont = list(color = '#FFFFFF'),
+                     text = ~paste('$', value),
+                     marker = list(colors = colors,
+                                   line = list(color = '#FFFFFF', width = 1)),
+                     showlegend = TRUE)
+      
+      fig <- fig %>% 
+        layout(title = 'Monthly Budget Expenditures',
+               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+  
+      fig
+      
+    })
+    output$budgetPieChart2 <- renderPlotly({
+      data <- budget_data() %>%
+        select(-c('Needs %', 'Wants %', 'Savings/Investing %', 'Needs', 'Wants', 'Savings_Investing')) %>%
+        pivot_longer(everything(), 
+                     cols_vary = "slowest", 
+                     names_to = "Type") 
+      #colors <- c('#fc8d62', '#8da0cb', '#66c2a5')
+      
+      fig <- plot_ly(data, labels = ~Type,
+                     values = ~value,
+                     type = 'pie',
+                     hoverinfo = 'label+text',
+                     insidetextfont = list(color = '#FFFFFF'),
+                     text = ~paste('$', value),
+                     #marker = list(colors = colors,
+                     #              line = list(color = '#FFFFFF', width = 1)),
+                     showlegend = TRUE)
+      
+      fig <- fig %>% 
+        layout(title = 'Detailed Monthly Budget Expenditures',
+               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+      
+      fig
+    })
+  })
   
   # Budget Data Table ----
   observeEvent(input$budgetbtn, {
     output$budgetTbl <- DT::renderDataTable({
-
-          selected_data <- budget_data() %>%
-            select('Needs %', 'Wants %', 'Savings/Investing %')
-          
-          datatable(selected_data,
-                    rownames = FALSE,
-                    fillContainer = TRUE,
-                    options = list(
-                      dom = 't',
-                      rowCallback = JS(
-                        "function(row, data, index) {",
-                        "$('td', row).css('height', '50px');",  # Custom row height
-                        "}"
-                      )
-                    )
-          ) %>%
-            formatStyle(
-              'Needs %',
-              backgroundColor = styleInterval(50, c('#91cf60', '#fc8d59'))
-            ) %>%
-            formatStyle(
-              'Wants %',
-              backgroundColor = styleInterval(30, c('#91cf60', '#fc8d59'))
-            ) %>%
-            formatStyle(
-              'Savings/Investing %',
-              backgroundColor = styleInterval(20, c('#91cf60', '#fc8d59'))
-            )
-          
-        })
-      })
       
+      selected_data <- budget_data() %>%
+      select(c('Needs %', 'Wants %', 'Savings/Investing %'))
+      
+      datatable(selected_data,
+                rownames = FALSE,
+                fillContainer = TRUE,
+                options = list(
+                  dom = 't',
+                  rowCallback = JS(
+                    "function(row, data, index) {",
+                    "$('td', row).css('height', '50px');",  # Custom row height
+                    "}"
+                  )
+                )
+      ) %>%
+        formatStyle(
+          'Needs %',
+          backgroundColor = styleInterval(50, c('#91cf60', '#fc8d59'))
+        ) %>%
+        formatStyle(
+          'Wants %',
+          backgroundColor = styleInterval(30, c('#91cf60', '#fc8d59'))
+        ) %>%
+        formatStyle(
+          'Savings/Investing %',
+          backgroundColor = styleInterval(20, c('#fc8d59', '#91cf60'))
+        )
+      
+    })
+  })
+  
   
   
   # Retirement Growth Plot ----
