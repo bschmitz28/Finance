@@ -9,7 +9,8 @@
 #' @return vector of packages as strings
 
 packages <- function() {
-  return(c('shiny','shinydashboard','shinydashboardPlus','shinyWidgets', 'rsconnect','tidyverse','plotly','DT',
-           'RODBC','readxl','reshape2','lubridate','glue','ggrepel','stringr','timeDate','readr',
-           'tidyr','odbc','stats','ggthemes','shinyjs','shinyBS','praise','ggridges', 'openxlsx', 'bslib', 'scales'))
+  return(c('shiny', 'shinydashboard', 'shinydashboardPlus', 'shinyWidgets', 'rsconnect', 'tidyverse',
+           'plotly', 'DT', 'odbc', 'ggrepel', 'timeDate', 'ggthemes', 'shinyjs', 'shinyBS', 
+           'praise', 'ggridges', 'openxlsx', 'bslib', 'scales', 'quantmod'))
+
 }
