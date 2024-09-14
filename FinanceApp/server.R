@@ -177,173 +177,185 @@ function(input, output, session) {
     ifelse(input$household_count == "One Person", "", paste("Person 2 HSA Contribution Limit (Family): $", limits()$p2_limits$limhsatwo55))
   })
   
-  # Budget Pie Chart ----
-  observeEvent(input$budgetbtn, {
-    output$budgetPieChart <- renderPlotly({
-      data <- budget_data() %>%
+  
+  # Reactive expression for pie chart data
+  reactivePieData <- eventReactive(input$budgetbtn, {
+    list(
+      pieChart1 = budget_data() %>%
         select(c('Needs', 'Wants', 'Savings_Investing')) %>%
         pivot_longer(everything(), 
                      cols_vary = "slowest", 
-                     names_to = "Type")
-      
-      colors <- c('#fc8d62', '#8da0cb', '#66c2a5')
-      
-      fig <- plot_ly(data, labels = ~Type,
-                     values = ~value,
-                     type = 'pie',
-                     hoverinfo = 'label+text',
-                     insidetextfont = list(color = '#FFFFFF'),
-                     text = ~paste('$', value),
-                     marker = list(colors = colors,
-                                   line = list(color = '#FFFFFF', width = 1)),
-                     showlegend = TRUE)
-      
-      fig <- fig %>% 
-        layout(title = 'Monthly Budget Expenditures',
-               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-               margin = list(l = 40, r = 40, b = 40, t = 100), 
-               height = 400,
-               width = 450)   
-      
-      fig
-    })
-    
-    output$budgetPieChart2 <- renderPlotly({
-      data <- budget_data() %>%
+                     names_to = "Type"),
+      pieChart2 = budget_data() %>%
         select(-c('Needs %', 'Wants %', 'Savings/Investing %', 'Needs', 'Wants', 'Savings_Investing')) %>%
         pivot_longer(everything(), 
                      cols_vary = "slowest", 
                      names_to = "Type")
-      
-      fig <- plot_ly(data, labels = ~Type,
-                     values = ~value,
-                     type = 'pie',
-                     hoverinfo = 'label+text',
-                     insidetextfont = list(color = '#FFFFFF'),
-                     text = ~paste('$', value),
-                     showlegend = TRUE)
-      
-      fig <- fig %>% 
-        layout(title = 'Detailed Monthly Budget Expenditures',
-               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-               margin = list(l = 40, r = 40, b = 40, t = 100),
-               height = 400,
-               width = 450)   
-      
-      fig
-    })
+    )
+  })
+  
+  # Render the first pie chart
+  output$budgetPieChart <- renderPlotly({
+    data <- reactivePieData()$pieChart1
     
-    output$noteOutput <- renderUI({
-      div("This is following the 50/30/20 principle. It is advised to have 'Needs' less than or equal to 50%, 'Wants' less than or equal to 30%, and 'Savings/Investing' greater than or equal to 20%.", 
-          style = "font-size:14px; color: gray; padding: 10px;")
-    })
+    colors <- c('#fc8d62', '#8da0cb', '#66c2a5')
+    
+    fig <- plot_ly(data, labels = ~Type,
+                   values = ~value,
+                   type = 'pie',
+                   hoverinfo = 'label+text',
+                   insidetextfont = list(color = '#FFFFFF'),
+                   text = ~paste('$', value),
+                   marker = list(colors = colors,
+                                 line = list(color = '#FFFFFF', width = 1)),
+                   showlegend = TRUE) %>%
+      layout(title = 'Monthly Budget Expenditures',
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             margin = list(l = 40, r = 40, b = 100, t = 100),
+             height = 500)
+    fig
   })
   
-  # Budget Data Table ----
-  observeEvent(input$budgetbtn, {
-    output$budgetTbl <- DT::renderDataTable({
-      selected_data <- budget_data() %>%
-        select(c('Needs %', 'Wants %', 'Savings/Investing %'))
-      
-      datatable(selected_data,
-                rownames = FALSE,
-                fillContainer = TRUE,
-                options = list(
-                  dom = 't',
-                  rowCallback = JS(
-                    "function(row, data, index) {",
-                    "$('td', row).css('height', '50px');",  # Custom row height
-                    "}"
-                  )
+  # Render the second pie chart
+  output$budgetPieChart2 <- renderPlotly({
+    data <- reactivePieData()$pieChart2
+    
+    fig <- plot_ly(data, labels = ~Type,
+                   values = ~value,
+                   type = 'pie',
+                   hoverinfo = 'label+text',
+                   insidetextfont = list(color = '#FFFFFF', size = 9),
+                   text = ~paste('$', value),
+                   showlegend = TRUE) %>%
+      layout(title = 'Detailed Monthly Budget Expenditures',
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             margin = list(l = 40, r = 40, b = 100, t = 100),
+             height = 500)   
+    fig
+  })
+  
+  # Reactive expression for data table
+  reactiveTableData <- eventReactive(input$budgetbtn, {
+    budget_data() %>%
+      select(c('Needs %', 'Wants %', 'Savings/Investing %'))
+  })
+  
+  # Render the data table
+  output$budgetTbl <- DT::renderDataTable({
+    selected_data <- reactiveTableData()
+    
+    datatable(selected_data,
+              rownames = FALSE,
+              fillContainer = TRUE,
+              options = list(
+                dom = 't',
+                rowCallback = JS(
+                  "function(row, data, index) {",
+                  "$('td', row).css('height', '50px');",  # Custom row height
+                  "}"
                 )
+              )
+    ) %>%
+      formatStyle(
+        'Needs %',
+        backgroundColor = styleInterval(50, c('#91cf60', '#fc8d59'))
       ) %>%
-        formatStyle(
-          'Needs %',
-          backgroundColor = styleInterval(50, c('#91cf60', '#fc8d59'))
-        ) %>%
-        formatStyle(
-          'Wants %',
-          backgroundColor = styleInterval(30, c('#91cf60', '#fc8d59'))
-        ) %>%
-        formatStyle(
-          'Savings/Investing %',
-          backgroundColor = styleInterval(20, c('#fc8d59', '#91cf60'))
-        )
-    })
+      formatStyle(
+        'Wants %',
+        backgroundColor = styleInterval(30, c('#91cf60', '#fc8d59'))
+      ) %>%
+      formatStyle(
+        'Savings/Investing %',
+        backgroundColor = styleInterval(20, c('#fc8d59', '#91cf60'))
+      )
   })
   
-  
-  
-  
-  # Retirement Growth Plot ----
-  observeEvent(input$growthplotbtn, {
-    output$retireGrowthPlot <- renderPlotly({
-      data <- projected_data()  # Get the reactive data frame
-      
-      if (input$household_count == "One Person") {
-        # Convert Balance column to numeric on the fly
-        data <- data %>% mutate(Balance = as.numeric(gsub("[$,]", "", Balance)))
-        
-        p <- ggplot(data, aes(x = Year, y = Balance, group = 1, text= paste("Year: ", Year, "<br>", 
-                                                                            "Age: ", Age, "<br>",
-                                                                            "Balance: ", dollar(Balance)))) +
-          geom_line(color = "#c09bd5") +
-          scale_y_continuous(labels = scales::dollar_format()) +
-          labs(title = "Projected Balance",
-               x = "Year",
-               y = "Balance") +
-          theme_minimal()
-        
-      } else {
-        # Convert columns to numeric on the fly for two persons scenario
-        data <- data %>%
-          mutate(p1_Balance = as.numeric(gsub("[$,]", "", p1_Balance)),
-                 p2_Balance = as.numeric(gsub("[$,]", "", p2_Balance)),
-                 `Total Balance` = as.numeric(gsub("[$,]", "", `Total Balance`)))
-        
-        p <- ggplot(data, aes(x = Year)) + 
-          geom_line(aes(y = p1_Balance, color = "Person 1", group = 1, text= paste("Year: ", Year, "<br>", 
-                                                                                   "P1 Age: ", p1_Age, "<br>",
-                                                                                   "P1 Balance: ", dollar(p1_Balance)))) + 
-          geom_line(aes(y = p2_Balance, color = "Person 2", group = 1, text= paste("Year: ", Year, "<br>", 
-                                                                                   "P1 Age: ", p2_Age, "<br>",
-                                                                                   "P1 Balance: ", dollar(p2_Balance)))) + 
-          geom_line(aes(y = `Total Balance`, color = "Total", group = 1, text= paste("Year: ", Year, "<br>",
-                                                                                     "Total Balance: ", dollar(`Total Balance`)))) + 
-          scale_y_continuous(labels = scales::dollar_format()) +
-          labs(title = "Projected Balance",
-               x = "Year",
-               y = "Balance",
-               color = "Household") +
-          theme_minimal()
-      }
-      
-      ggplotly(p, tooltip = c("text"))
-    })
+  # Reactive expression for note output
+  reactiveNoteOutput <- eventReactive(input$budgetbtn, {
+    div("This is following the 50/30/20 principle. It is advised to have 'Needs' less than or equal to 50%, 'Wants' less than or equal to 30%, and 'Savings/Investing' greater than or equal to 20%.", 
+        style = "font-size:14px; color: gray; padding: 10px;")
   })
   
-  
-  # Retirement Growth Table ----
-  observeEvent(input$growthtablebtn, {
-    output$retireGrowthTbl <- DT::renderDataTable({
-      if(input$household_count == "One Person") {
-        datatable(projected_data(),
-                  fillContainer = TRUE, 
-                  options = list(pageLength = 50, autoWidth = FALSE)) %>%
-          formatStyle("Balance", backgroundColor = "lightblue") %>%
-          formatStyle(columns = colnames(.$x$data), `font-size` = '12px')
-      } else {
-        datatable(projected_data(),
-                  fillContainer = TRUE, 
-                  options = list(pageLength = 50, autoWidth = FALSE)) %>%
-          formatStyle("p1_Balance", backgroundColor = "lightblue") %>% 
-          formatStyle("p2_Balance", backgroundColor = "lightblue") %>%
-          formatStyle("Total Balance", backgroundColor = "lightyellow") %>%
-          formatStyle(columns = colnames(.$x$data), `font-size` = '12px')
-      }
-      
-    })
+  # Render the note output
+  output$noteOutput <- renderUI({
+    reactiveNoteOutput()
   })
-}
+
+# Retirement Growth Plot ----
+  # Reactive expression for retirement growth plot data
+  reactiveGrowthPlotData <- eventReactive(input$growthplotbtn, {
+    data <- projected_data()  # Get the reactive data frame
+    
+    if (input$household_count == "One Person") {
+      # Convert Balance column to numeric on the fly
+      data <- data %>% mutate(Balance = as.numeric(gsub("[$,]", "", Balance)))
+      
+      p <- ggplot(data, aes(x = Year, y = Balance, group = 1, text= paste("Year: ", Year, "<br>", 
+                                                                          "Age: ", Age, "<br>",
+                                                                          "Balance: ", dollar(Balance)))) +
+        geom_line(color = "#c09bd5") +
+        scale_y_continuous(labels = scales::dollar_format()) +
+        labs(title = "Projected Balance",
+             x = "Year",
+             y = "Balance") +
+        theme_minimal()
+      
+    } else {
+      # Convert columns to numeric on the fly for two persons scenario
+      data <- data %>%
+        mutate(p1_Balance = as.numeric(gsub("[$,]", "", p1_Balance)),
+               p2_Balance = as.numeric(gsub("[$,]", "", p2_Balance)),
+               `Total Balance` = as.numeric(gsub("[$,]", "", `Total Balance`)))
+      
+      p <- ggplot(data, aes(x = Year)) + 
+        geom_line(aes(y = p1_Balance, color = "Person 1", group = 1, text= paste("Year: ", Year, "<br>", 
+                                                                                 "P1 Age: ", p1_Age, "<br>",
+                                                                                 "P1 Balance: ", dollar(p1_Balance)))) + 
+        geom_line(aes(y = p2_Balance, color = "Person 2", group = 1, text= paste("Year: ", Year, "<br>", 
+                                                                                 "P2 Age: ", p2_Age, "<br>",
+                                                                                 "P2 Balance: ", dollar(p2_Balance)))) + 
+        geom_line(aes(y = `Total Balance`, color = "Total", group = 1, text= paste("Year: ", Year, "<br>",
+                                                                                   "Total Balance: ", dollar(`Total Balance`)))) + 
+        scale_y_continuous(labels = scales::dollar_format()) +
+        labs(title = "Projected Balance",
+             x = "Year",
+             y = "Balance",
+             color = "Household") +
+        theme_minimal()
+    }
+    
+    ggplotly(p, tooltip = c("text"))
+  })
+  
+  # Render the retirement growth plot
+  output$retireGrowthPlot <- renderPlotly({
+    reactiveGrowthPlotData()
+  })
+  
+  # Reactive expression for retirement growth table data
+  reactiveGrowthTableData <- eventReactive(input$growthtablebtn, {
+    if (input$household_count == "One Person") {
+      datatable(projected_data(),
+                fillContainer = TRUE, 
+                options = list(pageLength = 50, autoWidth = FALSE)) %>%
+        formatStyle("Balance", backgroundColor = "lightblue") %>%
+        formatStyle(columns = colnames(.$x$data), `font-size` = '12px')
+    } else {
+      datatable(projected_data(),
+                fillContainer = TRUE, 
+                options = list(pageLength = 50, autoWidth = FALSE)) %>%
+        formatStyle("p1_Balance", backgroundColor = "lightblue") %>% 
+        formatStyle("p2_Balance", backgroundColor = "lightblue") %>%
+        formatStyle("Total Balance", backgroundColor = "lightyellow") %>%
+        formatStyle(columns = colnames(.$x$data), `font-size` = '12px')
+    }
+  })
+  
+  # Render the retirement growth table
+  output$retireGrowthTbl <- DT::renderDataTable({
+    reactiveGrowthTableData()
+    
+  }) # End of eventReactive
+} #End of server

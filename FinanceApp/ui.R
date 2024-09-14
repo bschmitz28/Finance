@@ -265,22 +265,6 @@ shinyUI(
                   )
                 )
               ),
-              br(),
-              br(),
-              # Row for the pie chart and data table
-              fluidRow(
-                column(
-                  width = 6,
-                  plotlyOutput('budgetPieChart')
-                ),
-                column(
-                  width = 6,
-                  plotlyOutput('budgetPieChart2')
-                )),
-              br(),
-              br(),
-              br(),
-              br(),
               fluidRow(
                 uiOutput("noteOutput")  # Conditionally display the note here
               ),
@@ -289,7 +273,20 @@ shinyUI(
                   width = 12,
                   DT::dataTableOutput('budgetTbl')
                 ) # End of col
-              ) # End of fluid row
+              ), # End of fluid row
+              # Row for the pie chart and data table
+              fluidRow(
+                column(
+                  width = 6,
+                  div(style = "overflow: auto; height: 500px;", plotlyOutput('budgetPieChart')
+                      )
+                ),
+                column(
+                  width = 6,
+                  div(style = "overflow: auto; height: 500px;", plotlyOutput('budgetPieChart2')
+                      )
+                )
+              ), # End of fluidRow
             ) # End of tab panel
           ) # End of tab box
         ), # End tab item
