@@ -173,7 +173,7 @@ shinyUI(
                        numericInput(
                          inputId = "rent_mort",
                          label = "Rent/Mortgage ($):",
-                         value = 2000,
+                         value = 2093,
                          min = 0,
                          max = 5000,
                          step = 10,
@@ -191,7 +191,7 @@ shinyUI(
                        numericInput(
                          inputId = "home_ins",
                          label = "Home/Renters Insurance ($):",
-                         value = 50,
+                         value = 0,
                          min = 0,
                          max = 500,
                          step = 5,
@@ -209,7 +209,7 @@ shinyUI(
                        numericInput(
                          inputId = "car_ins",
                          label = "Car Insurance ($):",
-                         value = 90,
+                         value = 140,
                          min = 0,
                          max = 500,
                          step = 5,
@@ -229,7 +229,7 @@ shinyUI(
                     numericInput(
                       inputId = "utilities",
                       label = "Utilities ($):",
-                      value = 150,
+                      value = 130,
                       min = 0,
                       max = 1000,
                       step = 10,
@@ -238,7 +238,7 @@ shinyUI(
                     numericInput(
                       inputId = "subscriptions",
                       label = "Subscriptions ($):",
-                      value = 50,
+                      value = 45,
                       min = 0,
                       max = 1000,
                       step = 5,
@@ -247,7 +247,7 @@ shinyUI(
                     numericInput(
                       inputId = "dining_out",
                       label = "Dining Out ($):",
-                      value = 200,
+                      value = 300,
                       min = 0,
                       max = 2000,
                       step = 5,
@@ -274,7 +274,7 @@ shinyUI(
                     numericInput(
                       inputId = "investing",
                       label = "Investing ($):",
-                      value = 300,
+                      value = 2166,
                       min = 0,
                       max = 10000,
                       step = 10,
@@ -308,6 +308,12 @@ shinyUI(
                   plotlyOutput('budgetPieChart2')
                 )),
               br(),
+              br(),
+              br(),
+              br(),
+              fluidRow(
+                uiOutput("noteOutput")  # Conditionally display the note here
+              ),
               fluidRow(
                 column(
                   width = 12,

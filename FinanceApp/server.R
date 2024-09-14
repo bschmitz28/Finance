@@ -180,13 +180,12 @@ function(input, output, session) {
   # Budget Pie Chart ----
   observeEvent(input$budgetbtn, {
     output$budgetPieChart <- renderPlotly({
-      
       data <- budget_data() %>%
-        #select(-c('Needs %', 'Wants %', 'Savings/Investing %', 'Needs', 'Wants', 'Savings_Investing')) %>%
         select(c('Needs', 'Wants', 'Savings_Investing')) %>%
         pivot_longer(everything(), 
                      cols_vary = "slowest", 
-                     names_to = "Type") 
+                     names_to = "Type")
+      
       colors <- c('#fc8d62', '#8da0cb', '#66c2a5')
       
       fig <- plot_ly(data, labels = ~Type,
@@ -202,18 +201,20 @@ function(input, output, session) {
       fig <- fig %>% 
         layout(title = 'Monthly Budget Expenditures',
                xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-  
-      fig
+               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+               margin = list(l = 40, r = 40, b = 40, t = 100), 
+               height = 400,
+               width = 450)   
       
+      fig
     })
+    
     output$budgetPieChart2 <- renderPlotly({
       data <- budget_data() %>%
         select(-c('Needs %', 'Wants %', 'Savings/Investing %', 'Needs', 'Wants', 'Savings_Investing')) %>%
         pivot_longer(everything(), 
                      cols_vary = "slowest", 
-                     names_to = "Type") 
-      #colors <- c('#fc8d62', '#8da0cb', '#66c2a5')
+                     names_to = "Type")
       
       fig <- plot_ly(data, labels = ~Type,
                      values = ~value,
@@ -221,25 +222,30 @@ function(input, output, session) {
                      hoverinfo = 'label+text',
                      insidetextfont = list(color = '#FFFFFF'),
                      text = ~paste('$', value),
-                     #marker = list(colors = colors,
-                     #              line = list(color = '#FFFFFF', width = 1)),
                      showlegend = TRUE)
       
       fig <- fig %>% 
         layout(title = 'Detailed Monthly Budget Expenditures',
                xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+               margin = list(l = 40, r = 40, b = 40, t = 100),
+               height = 400,
+               width = 450)   
       
       fig
+    })
+    
+    output$noteOutput <- renderUI({
+      div("This is following the 50/30/20 principle. It is advised to have 'Needs' less than or equal to 50%, 'Wants' less than or equal to 30%, and 'Savings/Investing' greater than or equal to 20%.", 
+          style = "font-size:14px; color: gray; padding: 10px;")
     })
   })
   
   # Budget Data Table ----
   observeEvent(input$budgetbtn, {
     output$budgetTbl <- DT::renderDataTable({
-      
       selected_data <- budget_data() %>%
-      select(c('Needs %', 'Wants %', 'Savings/Investing %'))
+        select(c('Needs %', 'Wants %', 'Savings/Investing %'))
       
       datatable(selected_data,
                 rownames = FALSE,
@@ -265,9 +271,9 @@ function(input, output, session) {
           'Savings/Investing %',
           backgroundColor = styleInterval(20, c('#fc8d59', '#91cf60'))
         )
-      
     })
   })
+  
   
   
   
