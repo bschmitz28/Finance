@@ -251,10 +251,30 @@ function(input, output, session) {
               fillContainer = TRUE,
               options = list(
                 dom = 't',
+                ordering = FALSE,  # Disable sorting
                 rowCallback = JS(
                   "function(row, data, index) {",
                   "$('td', row).css('height', '50px');",  # Custom row height
                   "}"
+                ),
+                columnDefs = list(
+                  list(
+                    className = 'dt-column-separator',
+                    targets = '_all'  # Apply the class to all columns
+                  ),
+                  list(
+                    targets = 0,  # Index of the first column
+                    width = '150px'  # Width for the first column
+                  ),
+                  list(
+                    targets = 1,  # Index of the second column
+                    width = '150px'  # Width for the second column
+                  ),
+                  list(
+                    targets = 2,  # Index of the third column
+                    width = '150px'  # Width for the third column
+                  )
+                  # Add more targets and widths if you have more columns
                 )
               )
     ) %>%

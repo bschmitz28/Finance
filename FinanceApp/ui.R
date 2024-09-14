@@ -85,11 +85,13 @@ shinyUI(
     dashboardBody(
       useShinyjs(),
       tags$head(
-        tags$style(HTML("hr {border-top: 1px solid #000000;}"))
-      ),
-      tags$style(type = 'text/css', '.modal-dialog {width: fit-content !important;}'),
-      tags$style(
-      "
+        tags$style(HTML("
+      hr {border-top: 1px solid #000000;}
+
+      .modal-dialog {
+        width: fit-content !important;
+      }
+
       #p1_age-label,
       #p1_salary-label,
       #p1_wagegrowth-label,
@@ -113,10 +115,28 @@ shinyUI(
       #p1_currenthsa-label,
       #p2_current401k-label,
       #p2_currentroth-label,
-      #p2_currenthsa-label {font-size: 0.75em;}
-      "
-      ),
-      
+      #p2_currenthsa-label {
+        font-size: 0.75em;
+      }
+
+     /* Custom styles for DataTable columns */
+      .dataTables_wrapper .dataTables_scroll .dataTables_scrollHead .dataTables_scrollHeadInner {
+        border-collapse: separate;
+      }
+
+      .dataTables_wrapper .dataTables_scroll .dataTables_scrollHead th {
+        border-right: 2px solid white; /* Adjust color if needed */
+      }
+
+      .dataTables_wrapper .dataTables_scroll .dataTables_scrollHead th:last-child {
+        border-right: none;
+      }
+
+      .dataTables_wrapper .dataTables_scroll .dataTables_scrollBody td {
+        border-right: 2px solid white; /* Adjust color if needed */
+      }
+    "))  # End of tags$style
+      ),  # End of tags$head,
       # Tabs for 3 sections ----
       tabItems(
         # Budget Quick Look Tab ----
@@ -279,12 +299,12 @@ shinyUI(
                 column(
                   width = 6,
                   div(style = "overflow: auto; height: 500px;", plotlyOutput('budgetPieChart')
-                      )
+                  )
                 ),
                 column(
                   width = 6,
                   div(style = "overflow: auto; height: 500px;", plotlyOutput('budgetPieChart2')
-                      )
+                  )
                 )
               ), # End of fluidRow
             ) # End of tab panel
