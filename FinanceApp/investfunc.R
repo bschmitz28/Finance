@@ -122,7 +122,7 @@ setMethod("addInvestToPortfolio", "Portfolio", function(x, invest){
   }
   
   # check that num of shares and ticker are not null
-  if(is.null(invest@num_shares) || is.null(invest@ticker)) {
+  if(is.null(invest@share) || is.null(invest@ticker)) {
     warning("Investment must have both 'num_shares' and 'ticker' defined!")
   }
   
@@ -157,11 +157,40 @@ setMethod("removeInvestToPortfolio", "Portfolio", function(x, invest){
     warning("Investment with this ticker is not in the portfolio!")
     return(x)
   }
+  tickers_kept <- setdiff(existing_tickers, invest@ticker)
+  temp_list <- list()
   
-  x@investment_list = x@investment_list[existing_tickers != invest@ticker]
+  for (i in tickers_kept) {
+    temp_list[length(temp_list)+1] <-getInvestmentFromPortolio(x,i) #appending temp_list basically
+  }
+  x@investment_list <- temp_list
   x 
 }) 
 
+#next steps:define 2 func
+#get invest from portfolio (pass in ticker and it returns the investment) 
+setGeneric("getInvestmentFromPortolio", function(x, ...) standardGeneric("getInvestmentFromPortolio"))
+setMethod("getInvestmentFromPortolio", "Portfolio", function(x, ticker){
+  for(i in x@investment_list) {
+    if(ticker == i@ticker){
+      return(i)
+    }
+  }
+  warning("Check again, no matching investment associated with ticker")
+  return(NULL)
+})
+#next func would be replace investment in portfolio (pass in investment)
+setGeneric("replaceInvestmentInPortolio", function(x, ...) standardGeneric("replaceInvestmentInPortolio"))
+setMethod("replaceInvestmentInPortolio", "Portfolio", function(x, investment){
+  existing_tickers <- sapply(x@investment_list, function(i) i@ticker)
+  if(!(investment@ticker %in% existing_tickers)) {
+    warning("Investment with this ticker is not in the portfolio!")
+    return(x)
+  }
+  x <-removeInvestToPortfolio(x, investment)
+  x <-addInvestToPortfolio(x, investment)
+  x
+})
 
 # example code 
 # testinv1 <- new("Investment")
@@ -191,6 +220,10 @@ setMethod("removeInvestToPortfolio", "Portfolio", function(x, invest){
 # 
 # testport <- updatePortfolio(testport)
 # printPortfolio(testport)
+# testreplace <- getInvestmentFromPortolio(testport, "SCHD")
+# testreplace <- setShare(testreplace, 20)
+# testport <- replaceInvestmentInPortolio(testport, testreplace)
+
 
 
 
