@@ -161,7 +161,7 @@ setMethod("removeInvestToPortfolio", "Portfolio", function(x, invest){
   temp_list <- list()
   
   for (i in tickers_kept) {
-    temp_list[length(temp_list)+1] <-getInvestmentFromPortolio(x,i) #appending temp_list basically
+    temp_list <- append(temp_list, list(getInvestmentFromPortolio(x, i)))
   }
   x@investment_list <- temp_list
   x 
@@ -223,6 +223,7 @@ setMethod("replaceInvestmentInPortolio", "Portfolio", function(x, investment){
 # testreplace <- getInvestmentFromPortolio(testport, "SCHD")
 # testreplace <- setShare(testreplace, 20)
 # testport <- replaceInvestmentInPortolio(testport, testreplace)
+# testrm <- removeInvestToPortfolio(testport, testinv1) #removing SCHD from testport
 
 
 
