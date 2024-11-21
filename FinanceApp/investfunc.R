@@ -38,7 +38,7 @@ setMethod("setTicker", "Investment", function(x, user_ticker){
 setGeneric("getShare", function(x) standardGeneric("getShare"))
 
 setMethod("getShare", "Investment", function(x){
-  x@share #we don't need to return x since x is declared and isn't being changed
+  x@share 
 })
 
 setGeneric("setShare", function(x, ...) standardGeneric("setShare"))
@@ -115,7 +115,7 @@ setMethod("printPortfolio", "Portfolio", function(x){
 setGeneric("addInvestToPortfolio", function(x, ...) standardGeneric("addInvestToPortfolio"))
 
 setMethod("addInvestToPortfolio", "Portfolio", function(x, invest){
-  #if statement for if it's a valid investment class object then run 120, else warning, return x at the end
+  #if statement for if it's a valid investment class object
   if(class(invest) != "Investment") {
     warning("The object provided is not of class 'Investment'.")
     return(x)
@@ -140,7 +140,7 @@ setMethod("addInvestToPortfolio", "Portfolio", function(x, invest){
 setGeneric("removeInvestToPortfolio", function(x, ...) standardGeneric("removeInvestToPortfolio"))
 
 setMethod("removeInvestToPortfolio", "Portfolio", function(x, invest){
-  #if statement for if it's a valid investment class object then run 120, else warning, return x at the end
+  #if statement for if it's a valid investment class object 
   if(class(invest) != "Investment") {
     warning("The object provided is not of class 'Investment'.")
     return(x)
