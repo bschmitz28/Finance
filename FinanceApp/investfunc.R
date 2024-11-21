@@ -137,9 +137,9 @@ setMethod("addInvestToPortfolio", "Portfolio", function(x, invest){
   x 
 }) 
 
-setGeneric("removeInvestToPortfolio", function(x, ...) standardGeneric("removeInvestToPortfolio"))
+setGeneric("removeInvestFromPortfolio", function(x, ...) standardGeneric("removeInvestFromPortfolio"))
 
-setMethod("removeInvestToPortfolio", "Portfolio", function(x, invest){
+setMethod("removeInvestFromPortfolio", "Portfolio", function(x, invest){
   #if statement for if it's a valid investment class object 
   if(class(invest) != "Investment") {
     warning("The object provided is not of class 'Investment'.")
@@ -187,7 +187,7 @@ setMethod("replaceInvestmentInPortolio", "Portfolio", function(x, investment){
     warning("Investment with this ticker is not in the portfolio!")
     return(x)
   }
-  x <-removeInvestToPortfolio(x, investment)
+  x <-removeInvestFromPortfolio(x, investment)
   x <-addInvestToPortfolio(x, investment)
   x
 })
@@ -223,7 +223,7 @@ setMethod("replaceInvestmentInPortolio", "Portfolio", function(x, investment){
 # testreplace <- getInvestmentFromPortolio(testport, "SCHD")
 # testreplace <- setShare(testreplace, 20)
 # testport <- replaceInvestmentInPortolio(testport, testreplace)
-# testrm <- removeInvestToPortfolio(testport, testinv1) #removing SCHD from testport
+# testrm <- removeInvestFromPortfolio(testport, testinv1) #removing SCHD from testport
 
 
 
