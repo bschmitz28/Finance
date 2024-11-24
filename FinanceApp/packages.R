@@ -11,6 +11,6 @@
 packages <- function() {
   return(c('shiny', 'shinydashboard', 'shinydashboardPlus', 'shinyWidgets', 'rsconnect', 'tidyverse',
            'plotly', 'DT', 'odbc', 'ggrepel', 'timeDate', 'ggthemes', 'shinyjs', 'shinyBS', 
-           'praise', 'ggridges', 'openxlsx', 'bslib', 'scales', 'quantmod'))
+           'praise', 'ggridges', 'openxlsx', 'bslib', 'scales', 'quantmod', 'glue'))
 
 }

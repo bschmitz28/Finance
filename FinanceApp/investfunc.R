@@ -266,7 +266,48 @@ setMethod("updateFutureNeeds", "PortfolioManager", function(x){
 })
 
 # function to return a dataframe in format of the one in the google sheets
+setGeneric("returnPortfolioManagerTable", function(x) standardGeneric("returnPortfolioManagerTable"))
+
+setMethod("returnPortfolioManagerTable", "PortfolioManager", function(x){
+  p = updatePortfolio(x@portfolio)
+  ticker_list = list()
+  shares_list = list()
+  dollars_list = list()
+  for (investment in p@investment_list){
+    ticker_list = append(ticker_list, list(investment@ticker))
+    shares_list = append(shares_list, list(investment@share))
+    dollars_list = append(dollars_list, list(investment@ttl_value))
+  }
+    
+  df_temp = data.frame(`Ticker` = unlist(ticker_list),
+                       `Shares` = unlist(shares_list),
+                       `Dollars` = unlist(dollars_list), 
+                       `Desired Percent` = unlist(x@target_perc), 
+                       `Shares Needed` = unlist(x@shares_needed), 
+                       `Dollars Needed` = unlist(x@dollars_needed), 
+                       check.names = FALSE
+                      )
+
+return (df_temp)
+})
+
+
 # func top print this 
+setGeneric("printPortfolioManager", function(x) standardGeneric("printPortfolioManager"))
+
+setMethod("printPortfolioManager", "PortfolioManager", function(x){
+  print(glue("Money to Invest: ${round(x@money_to_invest,2)}"))
+  df_temp = returnPortfolioManagerTable(x) %>%
+    mutate(Dollars = glue("${round(Dollars, 2)}"), 
+           `Desired Percent` = glue("{`Desired Percent`}%"), 
+           `Shares Needed` = round(`Shares Needed`, 2), 
+           `Dollars Needed` = glue("${round(`Dollars Needed`, 2)}"))
+  print(df_temp)
+})
+
+
+
+
 
 
 # example code 
@@ -310,8 +351,8 @@ testpm = setDesiredInvestPerc(testpm, list(75, 25))
 testpm = updateFutureNeeds(testpm)
 testpm@shares_needed
 testpm@dollars_needed
-
-
+returnPortfolioManagerTable(testpm)
+printPortfolioManager(testpm)
 
 
 
