@@ -192,6 +192,83 @@ setMethod("replaceInvestmentInPortolio", "Portfolio", function(x, investment){
   x
 })
 
+#setting the investment manager class ----
+setClass(
+  "PortfolioManager", 
+  slots = c(
+    portfolio = "Portfolio",
+    money_to_invest = "numeric",
+    current_perc = "list",
+    target_perc = "list", 
+    shares_needed = "list", 
+    dollars_needed = "list"
+  )
+)
+
+# function to set money user wants to invest
+setGeneric("setMoneyInvest", function(x, ...) standardGeneric("setMoneyInvest"))
+
+setMethod("setMoneyInvest", "PortfolioManager", function(x, user_money){
+  x@money_to_invest = user_money
+  x
+})
+
+# function to get percentages of investments in portfolio
+setGeneric("updateInvestPerc", function(x) standardGeneric("updateInvestPerc"))
+
+setMethod("updateInvestPerc", "PortfolioManager", function(x){
+  p = updatePortfolio(x@portfolio)
+  ttl_val = p@ttl_value
+  temp_list = list()
+  for (investment in p@investment_list) {
+    temp_list = append(temp_list, list((investment@ttl_value/ttl_val)*100))
+  }
+  x@current_perc = temp_list
+  return (x)
+})
+
+# function to set desired percentages of investments in portfolio
+setGeneric("setDesiredInvestPerc", function(x, ...) standardGeneric("setDesiredInvestPerc"))
+
+setMethod("setDesiredInvestPerc", "PortfolioManager", function(x, user_desire_perc){
+  #as a future improvement, validation check: 1) make sure they sum to 100, 2) make sure length of list = length of current_perc
+  #3) no individual entry should be negative
+  x@target_perc = user_desire_perc 
+  return (x)
+})
+
+# func for shares need and dollars needed 
+setGeneric("updateFutureNeeds", function(x) standardGeneric("updateFutureNeeds"))
+
+setMethod("updateFutureNeeds", "PortfolioManager", function(x){
+ # as a future improvement, validate to make sure target_perc is not empty
+ #basically get total pool of money plus extra money I want to invest then I basically get dollars needed then shares
+  dollar_temp = list() #this is for dollars needed
+  shares_temp = list() #this is for shares needed
+  p = updatePortfolio(x@portfolio)
+  target_value = p@ttl_value + x@money_to_invest #denominator for everything
+  
+  cnt = 1
+  for (investment in p@investment_list){
+    target_dollar = (x@target_perc[[cnt]]*target_value)/100
+    current_dollar = investment@ttl_value
+    delta_dollar = target_dollar - current_dollar
+    delta_shares = (delta_dollar/investment@share_price)
+    
+    dollar_temp = append(dollar_temp, list(delta_dollar))
+    shares_temp[cnt] = list(delta_shares) #since we have cnt we don't need to use [length(shares_temp)+1]
+    cnt = cnt+1
+  }
+  x@dollars_needed = dollar_temp
+  x@shares_needed = shares_temp
+  
+  return (x)
+})
+
+# function to return a dataframe in format of the one in the google sheets
+# func top print this 
+
+
 # example code 
 # testinv1 <- new("Investment")
 # testinv2 <- new("Investment")
@@ -224,7 +301,15 @@ setMethod("replaceInvestmentInPortolio", "Portfolio", function(x, investment){
 # testreplace <- setShare(testreplace, 20)
 # testport <- replaceInvestmentInPortolio(testport, testreplace)
 # testrm <- removeInvestFromPortfolio(testport, testinv1) #removing SCHD from testport
+testpm <- new("PortfolioManager")
+testpm@portfolio = testport
+testpm <- updateInvestPerc(testpm)
+testpm@money_to_invest <-1000
 
+testpm = setDesiredInvestPerc(testpm, list(75, 25))
+testpm = updateFutureNeeds(testpm)
+testpm@shares_needed
+testpm@dollars_needed
 
 
 
