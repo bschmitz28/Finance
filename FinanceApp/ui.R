@@ -342,9 +342,19 @@ shinyUI(
               fluidRow(
                 column(
                   width = 12, 
-                  "DT table editable placeholder"
+                  DT::dataTableOutput('investTbl', height = "50em")
                 )
-              )
+              ), # End of 2nd fluidrow
+              fluidRow(
+                column(
+                  width = 6, 
+                  offset = 1,
+                  actionButton(
+                    inputId = "investbtn",
+                    label = "Run Analysis"
+                  )
+                )
+              ) # End of 3rd fluidrow
             ), #End of tab panel
           ) # End of tab box
         ), # End of tab item
