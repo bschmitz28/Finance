@@ -317,12 +317,36 @@ shinyUI(
           h2('Investment Breakdown'),
           infoBox(
             title = "Welcome to the Finance App",
-            value = "Please use the inputs page to fill in investment paramters. Next, view Investment Output to see graphs",
+            value = "Please enter the inputs for your portfolio.",
             icon = icon('chart-line'),
             color = "purple",
             fill = F, 
             width = 12
           ), # End of info box
+          tabBox(
+            tabPanel(
+              title = strong('Portfolio'), 
+              fluidRow(
+                column(
+                  width = 6, 
+                  numericInput(
+                    inputId = "money_to_invest",
+                    label = "Money To Invest:",
+                    value = 1000,
+                    min = 0,
+                    max = 10000000,
+                    step = 1
+                  )
+                )
+              ), # End of 1st fluidrow
+              fluidRow(
+                column(
+                  width = 12, 
+                  "DT table editable placeholder"
+                )
+              )
+            ), #End of tab panel
+          ) # End of tab box
         ), # End of tab item
         
         # Retirement Analysis Tab ----
@@ -567,7 +591,7 @@ shinyUI(
                        textOutput("limit_roth_ira_two_catchup_display"),
                        textOutput("limit_hsa_two_55_display")
                 )
-              )
+              ) # End of 2nd fluid row
             ), # End Inputs Tab Panel
             
             tabPanel(
