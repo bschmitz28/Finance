@@ -5,7 +5,8 @@
 # Preamble ----
 library(shiny)
 source("global.R") # Load global variables
-source("budgetfunc.R") # Computer budget outputs for pie chart and table
+source("budgetfunc.R") # Compute budget outputs for pie chart and table
+source("investfunc.R") # Compute investment outputs for DT tbl
 source("retirementgrowthfunc.R") # Compute the retirement growth for the table and plot
 
 # Server function ----
@@ -27,7 +28,8 @@ function(input, output, session) {
     savings = 0,
     investing = 0,
     # investment
-    
+    money_to_invest = 0,
+    num_investments = 0,
     # retirement
     p1_age = 0,
     p2_age = 0,
@@ -177,7 +179,7 @@ function(input, output, session) {
     ifelse(input$household_count == "One Person", "", paste("Person 2 HSA Contribution Limit (Family): $", limits()$p2_limits$limhsatwo55))
   })
   
-  
+# Budget outputs ----
   # Reactive expression for pie chart data
   reactivePieData <- eventReactive(input$budgetbtn, {
     list(
@@ -302,6 +304,74 @@ function(input, output, session) {
   output$noteOutput <- renderUI({
     reactiveNoteOutput()
   })
+# Investment Editable DT ----
+  
+  # Reactive values to hold the investment table
+  investments <- reactiveVal(data.frame(
+    `Ticker(s)` = character(0),
+    `Current Shares` = numeric(0),
+    `Current Dollars` = numeric(0),
+    `Desired %` = numeric(0),
+    `Shares Needed` = numeric(0),
+    `Dollars Needed` = numeric(0),
+    stringsAsFactors = FALSE
+  ))
+  
+  # Update table when num_investments changes
+  observeEvent(input$num_investments, {
+    req(input$money_to_invest)  # To require money to invest to be not NA
+    
+    num <- as.numeric(input$num_investments)
+    
+    temp_tbl <- data.frame(
+      `Ticker(s)` = paste0("Ticker ", seq_len(num)),  # Example placeholder names
+      `Current Shares` = rep(0, num),
+      `Current Dollars` = rep(0, num),
+      `Desired %` = rep(0, num),
+      `Shares Needed` = rep(0, num),
+      `Dollars Needed` = rep(0, num),
+      stringsAsFactors = FALSE
+    )
+    
+    investments(temp_tbl)
+  })
+  
+  # Capture edits made to table
+  observeEvent(input$investTbl_cell_edit, {
+    info <- input$investTbl_cell_edit
+    updated_data <- investments()
+    updated_data[info$row, info$col] <- info$value
+    investments(updated_data)
+  })
+  
+  # Render the editable data table
+  output$investTbl <- DT::renderDataTable({
+    # Rename columns before rendering the table
+    renamed_data <- investments()
+    colnames(renamed_data) <- c("Ticker", "Current Shares", "Current Dollars", "Desired %", "Shares Needed", "Dollars Needed")
+    
+    datatable(
+      renamed_data, 
+      editable = list(target = "cell", columns = c(1, 2, 3, 4)),
+      options = list(
+        searching = FALSE,  # Disable the search box
+        lengthChange = FALSE,  # Hide the "Show entries" dropdown
+        striped = FALSE,  # Disable alternating row colors
+        ordering = FALSE, # Disable sort
+        paging = FALSE, # Disable page num
+        info = FALSE # Disable page text info
+      )
+    ) %>%
+      formatStyle(
+        c("Ticker", "Current Shares", "Current Dollars", "Desired %"),  # Columns to style
+        backgroundColor = "#ffcccb",  # Apply red background color
+        color = "white"  # Optional: change text color to white for contrast
+      )
+  })
+  
+  
+  
+  
 
 # Retirement Growth Plot ----
   # Reactive expression for retirement growth plot data

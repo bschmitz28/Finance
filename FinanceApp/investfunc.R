@@ -342,17 +342,17 @@ setMethod("printPortfolioManager", "PortfolioManager", function(x){
 # testreplace <- setShare(testreplace, 20)
 # testport <- replaceInvestmentInPortolio(testport, testreplace)
 # testrm <- removeInvestFromPortfolio(testport, testinv1) #removing SCHD from testport
-testpm <- new("PortfolioManager")
-testpm@portfolio = testport
-testpm <- updateInvestPerc(testpm)
-testpm@money_to_invest <-1000
-
-testpm = setDesiredInvestPerc(testpm, list(75, 25))
-testpm = updateFutureNeeds(testpm)
-testpm@shares_needed
-testpm@dollars_needed
-returnPortfolioManagerTable(testpm)
-printPortfolioManager(testpm)
+# testpm <- new("PortfolioManager")
+# testpm@portfolio = testport
+# testpm <- updateInvestPerc(testpm)
+# testpm@money_to_invest <-1000
+# 
+# testpm = setDesiredInvestPerc(testpm, list(75, 25))
+# testpm = updateFutureNeeds(testpm)
+# testpm@shares_needed
+# testpm@dollars_needed
+# returnPortfolioManagerTable(testpm)
+# printPortfolioManager(testpm)
 
 
 

@@ -317,13 +317,15 @@ shinyUI(
           h2('Investment Breakdown'),
           infoBox(
             title = "Welcome to the Finance App",
-            value = "Please enter the inputs for your portfolio.",
+            value = "Please enter the inputs in the pink cells for your portfolio!",
             icon = icon('chart-line'),
             color = "purple",
             fill = F, 
             width = 12
           ), # End of info box
           tabBox(
+            title = "Invest",
+            width = 12,
             tabPanel(
               title = strong('Portfolio'), 
               fluidRow(
@@ -331,31 +333,40 @@ shinyUI(
                   width = 6, 
                   numericInput(
                     inputId = "money_to_invest",
-                    label = "Money To Invest:",
+                    label = "Money To Invest ($):",
                     value = 1000,
                     min = 0,
                     max = 10000000,
                     step = 1
+                  ), 
+                  selectInput(
+                    inputId = "num_investments",
+                    label = "Number of Investments:",
+                    choices = 2:10,
+                    selected = 3    
                   )
                 )
               ), # End of 1st fluidrow
               fluidRow(
                 column(
                   width = 12, 
-                  DT::dataTableOutput('investTbl', height = "50em")
+                  tags$div(
+                    style = "margin-bottom: 10px;", 
+                    DT::dataTableOutput('investTbl')
+                  )
                 )
-              ), # End of 2nd fluidrow
+              ),
               fluidRow(
                 column(
                   width = 6, 
-                  offset = 1,
+                  offset = 3,
                   actionButton(
                     inputId = "investbtn",
                     label = "Run Analysis"
                   )
                 )
-              ) # End of 3rd fluidrow
-            ), #End of tab panel
+              ) # End of 2nd fluidrow
+            ), # End of tab panel
           ) # End of tab box
         ), # End of tab item
         
