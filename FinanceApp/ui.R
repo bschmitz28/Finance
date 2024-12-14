@@ -329,20 +329,27 @@ shinyUI(
               fluidRow(
                 column(
                   width = 6, 
-                  numericInput(
-                    inputId = "money_to_invest",
-                    label = "Money To Invest:",
-                    value = 1000,
-                    min = 0,
-                    max = 10000000,
-                    step = 1
+                  actionButton(
+                    inputId = "add_investment", 
+                    label = "Add Investment"
                   )
+                  # numericInput(
+                  #   inputId = "money_to_invest",
+                  #   label = "Money To Invest:",
+                  #   value = 1000,
+                  #   min = 0,
+                  #   max = 10000000,
+                  #   step = 1
+                  # )
                 )
               ), # End of 1st fluidrow
               fluidRow(
                 column(
                   width = 12, 
-                  "DT table editable placeholder"
+                  tags$div(
+                    style = "margin-bottom: 10px;", 
+                    DT::dataTableOutput('investTbl')
+                  )
                 )
               )
             ), #End of tab panel

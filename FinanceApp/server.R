@@ -6,7 +6,9 @@
 library(shiny)
 source("global.R") # Load global variables
 source("budgetfunc.R") # Computer budget outputs for pie chart and table
+source("investfunc.R") # Compute the investment table
 source("retirementgrowthfunc.R") # Compute the retirement growth for the table and plot
+
 
 # Server function ----
 function(input, output, session) {
@@ -302,6 +304,48 @@ function(input, output, session) {
   output$noteOutput <- renderUI({
     reactiveNoteOutput()
   })
+
+# Investment table ----
+  inv_rv <- reactiveValues(port_man_1 = importPortfolioCSV())
+  
+  # this is to add initial investment!!
+  observeEvent(input$add_investment, {
+    # TODO: instead of hardcoding, make them based on field user can enter
+    # inv <- new("Investment")
+    # inv <- setTicker(inv, "VOO")
+    # inv <- setShare(inv, 10)
+    # #inv <- updateSharePrice(inv)
+    # port <- inv_rv$port_man_1@portfolio
+    # port <- addInvestToPortfolio(port, inv)
+    # port <-updatePortfolio(port)
+    # inv_rv$port_man_1@portfolio <- port
+    # inv_rv$port_man_1 <- updateInvestPerc(inv_rv$port_man_1)
+    # inv_rv$port_man_1 <- setDesiredInvestPerc(inv_rv$port_man_1, list(1))
+    # inv_rv$port_man_1@money_to_invest <- 1000
+    # inv_rv$port_man_1 <- updateFutureNeeds(inv_rv$port_man_1)
+    
+    # TODO: write updated portfolio back to the csv maybe in a sep button maybe in investfunc.R idk
+  })
+  
+  observe({
+    output$investTbl <- DT::renderDataTable({
+
+      temp_tbl <- returnPortfolioManagerTable(inv_rv$port_man_1)
+      datatable(
+        temp_tbl, 
+        editable = list(target = "cell", columns = c(1, 2, 3, 4)),
+        options = list(
+          searching = FALSE,  # Disable the search box
+          lengthChange = FALSE,  # Hide the "Show entries" dropdown
+          striped = FALSE,  # Disable alternating row colors
+          ordering = FALSE, # Disable sort
+          paging = FALSE, # Disable page num
+          info = FALSE # Disable page text info
+        )
+      )
+    })
+  })
+  
 
 # Retirement Growth Plot ----
   # Reactive expression for retirement growth plot data

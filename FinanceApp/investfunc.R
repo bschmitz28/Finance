@@ -85,6 +85,9 @@ setClass(
 setGeneric("updatePortfolio", function(x) standardGeneric("updatePortfolio"))
 
 setMethod("updatePortfolio", "Portfolio", function(x){
+  if(length(x@investment_list) == 0){
+    return(x)
+  }
   for (i in 1:length(x@investment_list)) {
     x@investment_list[[i]] <- updateSharePrice(x@investment_list[[i]])
     x@investment_list[[i]] <- updateTotalValue(x@investment_list[[i]])
@@ -192,7 +195,7 @@ setMethod("replaceInvestmentInPortolio", "Portfolio", function(x, investment){
   x
 })
 
-#setting the investment manager class ----
+#setting the Portfolio Manager class ----
 setClass(
   "PortfolioManager", 
   slots = c(
@@ -305,7 +308,31 @@ setMethod("printPortfolioManager", "PortfolioManager", function(x){
   print(df_temp)
 })
 
-
+# function to read in Portfolio(s) 
+importPortfolioCSV <- function(){
+  temp_df <- read_csv("/Users/rosie/Desktop/R/Finance/FinanceApp/inputs/Portfolios_csv.csv")
+  temp_port <- new("Portfolio")
+  temp_pm <- new("PortfolioManager")
+  if(nrow(temp_df) == 0){
+    return(temp_pm)
+  }
+  
+  for(i in 1:nrow(temp_df)){
+    temp_invest <- new("Investment")
+    temp_invest <- setTicker(temp_invest, temp_df[[i,1]])
+    temp_invest <- setShare(temp_invest, temp_df[[i, 2]])
+    temp_port <- addInvestToPortfolio(temp_port, temp_invest)
+  }
+  temp_port <- updatePortfolio(temp_port)
+  temp_pm@portfolio <- temp_port
+  temp_pm <- updateInvestPerc(temp_pm)
+  temp_pm <- setDesiredInvestPerc(temp_pm, as.list(temp_df$`Desired %`))
+  temp_pm@money_to_invest <- 0
+  temp_pm <- updateFutureNeeds(temp_pm)
+  
+  return(temp_pm)
+}
+  
 
 
 
@@ -342,17 +369,17 @@ setMethod("printPortfolioManager", "PortfolioManager", function(x){
 # testreplace <- setShare(testreplace, 20)
 # testport <- replaceInvestmentInPortolio(testport, testreplace)
 # testrm <- removeInvestFromPortfolio(testport, testinv1) #removing SCHD from testport
-testpm <- new("PortfolioManager")
-testpm@portfolio = testport
-testpm <- updateInvestPerc(testpm)
-testpm@money_to_invest <-1000
 
-testpm = setDesiredInvestPerc(testpm, list(75, 25))
-testpm = updateFutureNeeds(testpm)
-testpm@shares_needed
-testpm@dollars_needed
-returnPortfolioManagerTable(testpm)
-printPortfolioManager(testpm)
+# testpm <- new("PortfolioManager")
+# testpm@portfolio = testport
+# testpm <- updateInvestPerc(testpm)
+# testpm@money_to_invest <-1000
+# testpm = setDesiredInvestPerc(testpm, list(75, 25))
+# testpm = updateFutureNeeds(testpm)
+# testpm@shares_needed
+# testpm@dollars_needed
+# returnPortfolioManagerTable(testpm)
+# printPortfolioManager(testpm)
 
 
 
