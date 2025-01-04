@@ -2,11 +2,23 @@
 
 # Author: Rosie Schmitz
 
-# Define global variables (Update Yearly) 2024
-lim401k <- 23000
-limrothira <- 7000
-limhsa_one <- 4150
-limhsa_two <- 8300 
+comparison_date <-as.POSIXct("2024-12-31 00:00:00", format = "%Y-%m-%d %H:%M:%S")
+current_date <- Sys.time()
+
+#Define global variables (Update Yearly)
+if(current_date < comparison_date) {
+  # 2024 limits
+  lim401k <- 23000
+  limrothira <- 7000
+  limhsa_one <- 4150
+  limhsa_two <- 8300 
+} else {
+  # 2025 limits
+  lim401k <- 23500
+  limrothira <- 7000
+  limhsa_one <- 4300
+  limhsa_two <- 8550
+} 
 
 # Catch up Contributions 
 calculate_limits <- function(age) {
