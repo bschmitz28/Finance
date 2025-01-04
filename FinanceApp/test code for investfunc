@@ -1,0 +1,44 @@
+
+# example code 
+# testinv1 <- new("Investment")
+# testinv2 <- new("Investment")
+# 
+# testinv1 = setTicker(testinv1, "SCHD")
+# testinv2 = setTicker(testinv2, "VOO")
+# 
+# testinv1 = setShare(testinv1, 25)
+# testinv2 = setShare(testinv2, 8)
+# 
+# testinv1 = updateSharePrice(testinv1)
+# testinv2 = updateSharePrice(testinv2)
+# 
+# testinv1 = updateTotalValue(testinv1)
+# testinv2 = updateTotalValue(testinv2)
+# 
+# printInvest(testinv1)
+# printInvest(testinv2)
+# 
+# 
+# 
+# testport <- new("Portfolio")
+# testport <- addInvestToPortfolio(testport, testinv1)
+# testport <- addInvestToPortfolio(testport, testinv2)
+# testport <- updatePortfolio(testport)
+# 
+# testport <- updatePortfolio(testport)
+# printPortfolio(testport)
+# testreplace <- getInvestmentFromPortolio(testport, "SCHD")
+# testreplace <- setShare(testreplace, 20)
+# testport <- replaceInvestmentInPortolio(testport, testreplace)
+# testrm <- removeInvestFromPortfolio(testport, testinv1) #removing SCHD from testport
+
+# testpm <- new("PortfolioManager")
+# testpm@portfolio = testport
+# testpm <- updateInvestPerc(testpm)
+# testpm@money_to_invest <-1000
+# testpm = setDesiredInvestPerc(testpm, list(75, 25))
+# testpm = updateFutureNeeds(testpm)
+# testpm@shares_needed
+# testpm@dollars_needed
+# returnPortfolioManagerTable(testpm)
+# printPortfolioManager(testpm)
