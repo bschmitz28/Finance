@@ -161,6 +161,15 @@ shinyUI(
               fluidRow(
                 column(width = 6,
                        numericInput(
+                         inputId = "take_home",
+                         label = "Total Take Home ($):",
+                         value = 6000,
+                         min = 0,
+                         max = 20000,
+                         step = 10,
+                         width = NA
+                       ),
+                       numericInput(
                          inputId = "rent_mort",
                          label = "Rent/Mortgage ($):",
                          value = 2093,

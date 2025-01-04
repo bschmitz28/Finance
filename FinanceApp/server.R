@@ -15,6 +15,7 @@ function(input, output, session) {
   # Reactivity ----
   rv <- reactiveValues(
     # budget 
+    take_home = 0,
     rent_mort = 0,
     groceries = 0, 
     home_ins = 0,
@@ -56,6 +57,8 @@ function(input, output, session) {
     household_count = "One Person",
   )
   observe({
+    # budget
+    rv$take_home     <- input$take_home
     rv$rent_mort     <- input$rent_mort
     rv$groceries     <- input$groceries
     rv$home_ins      <- input$home_ins
@@ -70,6 +73,7 @@ function(input, output, session) {
     rv$investing     <- input$investing
   })
   observe({
+    #investment
     rv$p1_age          <- input$p1_age
     rv$p2_age          <- input$p2_age
     rv$p1_wagegrowth   <- input$p1_wagegrowth
@@ -97,11 +101,6 @@ function(input, output, session) {
     rv$household_count <- input$household_count
   })
   
-  # Reactive expression to create dataframe based on reactive values for budget
-  budget_data <- reactive({
-    df <- budget.output(rv$rent_mort, rv$groceries, rv$home_ins, rv$home_maint, rv$car_ins, rv$car_maint, rv$utilities, rv$subscriptions, 
-                        rv$dining_out, rv$hobbies, rv$savings,  rv$investing)
-  })
   
   # Reactive expression to create the dataframe based on reactive values for retirement growth
   projected_data <- reactive({
@@ -179,17 +178,23 @@ function(input, output, session) {
     ifelse(input$household_count == "One Person", "", paste("Person 2 HSA Contribution Limit (Family): $", limits()$p2_limits$limhsatwo55))
   })
   
+  
+  # Reactive expression to create dataframe based on reactive values for budget
+  budget_data <- reactive({
+    df <- budget.output(rv$take_home,rv$rent_mort, rv$groceries, rv$home_ins, rv$home_maint, rv$car_ins, rv$car_maint, rv$utilities, rv$subscriptions, 
+                        rv$dining_out, rv$hobbies, rv$savings,  rv$investing)
+  })  
 # Budget outputs ----
   # Reactive expression for pie chart data
   reactivePieData <- eventReactive(input$budgetbtn, {
     list(
       pieChart1 = budget_data() %>%
-        select(c('Needs', 'Wants', 'Savings_Investing')) %>%
+        select(c('Needs', 'Wants', 'Savings_Investing', 'Unallocated')) %>%
         pivot_longer(everything(), 
                      cols_vary = "slowest", 
                      names_to = "Type"),
       pieChart2 = budget_data() %>%
-        select(-c('Needs %', 'Wants %', 'Savings/Investing %', 'Needs', 'Wants', 'Savings_Investing')) %>%
+        select(-c('Needs %', 'Wants %', 'Savings/Investing %', 'Needs', 'Wants', 'Savings_Investing', 'Take_Home')) %>%
         pivot_longer(everything(), 
                      cols_vary = "slowest", 
                      names_to = "Type")
@@ -299,6 +304,7 @@ function(input, output, session) {
     div("This is following the 50/30/20 principle. It is advised to have 'Needs' less than or equal to 50%, 'Wants' less than or equal to 30%, and 'Savings/Investing' greater than or equal to 20%.", 
         style = "font-size:14px; color: gray; padding: 10px;")
   })
+  # TODO: make a conditional note for if unallocated > 0, a note with 'you have x dollars surplus unallocated' and if unallocated < 0, 'you are over spending $x amount'
   
   # Render the note output
   output$noteOutput <- renderUI({
