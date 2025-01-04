@@ -352,7 +352,7 @@ function(input, output, session) {
     
     datatable(
       renamed_data, 
-      editable = list(target = "cell", columns = c(1, 2, 3, 4)),
+      editable = list(target = "cell", disable = list(columns = c(0,3,5,6))),
       options = list(
         searching = FALSE,  # Disable the search box
         lengthChange = FALSE,  # Hide the "Show entries" dropdown
@@ -363,13 +363,62 @@ function(input, output, session) {
       )
     ) %>%
       formatStyle(
-        c("Ticker", "Current Shares", "Current Dollars", "Desired %"),  # Columns to style
+        c("Ticker", "Current Shares", "Desired %"),  # Columns to style
         backgroundColor = "#ffcccb",  # Apply red background color
-        color = "white"  # Optional: change text color to white for contrast
+        color = "black"  # Optional: change text color to white for contrast
+      ) %>%
+      formatRound("Shares Needed", digits = 3) %>%
+      formatCurrency("Current Dollars", currency = "$") %>%
+      formatCurrency("Dollars Needed", currency = "$") %>%
+      formatStyle(
+        'Shares Needed',
+        color = styleInterval(0, c('#fc8d59', '#91cf60'))
+      ) %>%
+      formatStyle(
+        'Dollars Needed',
+        color = styleInterval(0, c('#fc8d59', '#91cf60'))
       )
   })
   
+  # this is where Run Analysis Btn, it'll actually do stuff and things in the last 2 cols
+  # investments <- eventReactive(input$investbtn, {
+  #   
+  # })
   
+  observeEvent(input$investbtn, {
+    temp_tbl = investments()
+    
+    #create a for loop going through each of my 'investments' in temp tbl. as it goes through, assign it as new("Investment")
+    temp_port <- new("Portfolio") 
+    list_desire <-list()
+    
+    for(i in 1:nrow(temp_tbl)){
+      temp_investment <-new("Investment")
+      temp_investment <- setTicker(temp_investment, temp_tbl[i,1])
+      temp_investment <- setShare(temp_investment, temp_tbl[i,2])
+      temp_investment <- updateSharePrice(temp_investment)
+      temp_investment <- updateTotalValue(temp_investment)
+      
+      temp_port <- addInvestToPortfolio(temp_port, temp_investment)
+      list_desire <-append(list_desire, temp_tbl[i,4])
+    }
+    temp_port <- updatePortfolio(temp_port)
+    temp_pm <-new("PortfolioManager")
+    temp_pm@portfolio = temp_port
+    temp_pm <- updateInvestPerc(temp_pm)
+    
+    temp_pm@money_to_invest <- input$money_to_invest
+    temp_pm = setDesiredInvestPerc(temp_pm, list_desire)
+    temp_pm = updateFutureNeeds(temp_pm)
+    #print temp_tbl <- returnPortfolioManagerTable(temp_pm)
+    
+    output_tbl <- returnPortfolioManagerTable(temp_pm)
+    names(output_tbl) <- names(temp_tbl)
+    
+    #print(temp_tbl)
+    #print(output_tbl)
+    investments(output_tbl)
+  })
   
   
 
