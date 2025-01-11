@@ -121,9 +121,18 @@ function(input, output, session) {
       names(temp_df1)[2:9] <- paste("p1_", names(temp_df1)[2:9], sep ="")
       names(temp_df2)[2:9] <- paste("p2_", names(temp_df2)[2:9], sep ="")
       df <- full_join(temp_df1, temp_df2, by = "Year") #need for taking larger of the two projected years in df (ie someone 24 years and someone 25)
+     
+       # case for nrows(p1) and p2 not equal length
+      for(i in 2:nrow(df)) {
+       df[i, "p1_Balance"] <-if_else(is.na(df[i,"p1_Balance"]), df[i-1, "p1_Balance"], df[i, "p1_Balance"]) 
+       df[i, "p2_Balance"] <-if_else(is.na(df[i,"p2_Balance"]), df[i-1, "p2_Balance"], df[i, "p2_Balance"]) 
+      }
+
       df$`Total Balance` <- df$p1_Balance + df$p2_Balance
       df[,c(3:9, 11:18)] <- lapply(df[,c(3:9, 11:18)], dollar,accuracy = 0.01)
+      
       df
+      
     }
     
   })
@@ -378,19 +387,15 @@ function(input, output, session) {
       formatCurrency("Dollars Needed", currency = "$") %>%
       formatStyle(
         'Shares Needed',
-        color = styleInterval(0, c('#fc8d59', '#91cf60'))
+        color = styleInterval(0, c('#ff4d4d', '#91cf60'))
       ) %>%
       formatStyle(
         'Dollars Needed',
-        color = styleInterval(0, c('#fc8d59', '#91cf60'))
+        color = styleInterval(0, c('#ff4d4d', '#91cf60'))
       )
   })
-  
-  # this is where Run Analysis Btn, it'll actually do stuff and things in the last 2 cols
-  # investments <- eventReactive(input$investbtn, {
-  #   
-  # })
-  
+
+  # Run analysis button
   observeEvent(input$investbtn, {
     temp_tbl = investments()
     
@@ -399,7 +404,7 @@ function(input, output, session) {
     list_desire <-list()
     
     for(i in 1:nrow(temp_tbl)){
-      temp_investment <-new("Investment")
+      temp_investment <- new("Investment")
       temp_investment <- setTicker(temp_investment, temp_tbl[i,1])
       temp_investment <- setShare(temp_investment, temp_tbl[i,2])
       temp_investment <- updateSharePrice(temp_investment)
@@ -409,7 +414,7 @@ function(input, output, session) {
       list_desire <-append(list_desire, temp_tbl[i,4])
     }
     temp_port <- updatePortfolio(temp_port)
-    temp_pm <-new("PortfolioManager")
+    temp_pm <- new("PortfolioManager")
     temp_pm@portfolio = temp_port
     temp_pm <- updateInvestPerc(temp_pm)
     
@@ -484,13 +489,19 @@ function(input, output, session) {
     if (input$household_count == "One Person") {
       datatable(projected_data(),
                 fillContainer = TRUE, 
-                options = list(pageLength = 50, autoWidth = FALSE)) %>%
+                options = list(pageLength = 50, 
+                               autoWidth = FALSE, 
+                               searching = FALSE,
+                               lengthChange = FALSE)) %>%
         formatStyle("Balance", backgroundColor = "lightblue") %>%
         formatStyle(columns = colnames(.$x$data), `font-size` = '12px')
     } else {
       datatable(projected_data(),
                 fillContainer = TRUE, 
-                options = list(pageLength = 50, autoWidth = FALSE)) %>%
+                options = list(pageLength = 50, 
+                               autoWidth = FALSE, 
+                               searching = FALSE,
+                               lengthChange = FALSE)) %>%
         formatStyle("p1_Balance", backgroundColor = "lightblue") %>% 
         formatStyle("p2_Balance", backgroundColor = "lightblue") %>%
         formatStyle("Total Balance", backgroundColor = "lightyellow") %>%
@@ -501,6 +512,14 @@ function(input, output, session) {
   # Render the retirement growth table
   output$retireGrowthTbl <- DT::renderDataTable({
     reactiveGrowthTableData()
-    
   }) # End of eventReactive
+  
+  output$downloadbtn <- downloadHandler(
+    filename = function() {
+      paste("RetirementProjections-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(projected_data(), file)
+    }
+  )
 } #End of server

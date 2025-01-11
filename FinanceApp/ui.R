@@ -6,7 +6,7 @@
 source("global.R") # Load global variables
 source("packages.R") # Load packages
 packages <- packages()
-lapply(packages, require, character.only = TRUE)
+lapply(packages, library, character.only = TRUE)
 
 # height of figures
 figure.height <- '600px'
@@ -651,7 +651,15 @@ shinyUI(
               ),
               fluidRow(
                 DT::dataTableOutput('retireGrowthTbl', height = "50em")
-              ) 
+              ), 
+              fluidRow(
+                column(width = 12, offset = 2,
+                       downloadButton(
+                         outputId = "downloadbtn",
+                         label = "Download Table"
+                       )
+                )
+              ) # End Fluid Row
             ) # End Growth Table Tab Panel
           ) # End Tab Box
         ) # End Tab Item

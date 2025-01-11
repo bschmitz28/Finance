@@ -11,8 +11,8 @@
 retirement.growth <- function(age, wagegrowth, emp_match, emp_contrib, ratereturn, roth, hsa, current_year, 
                               current401k, currentroth, currenthsa, salary) {
   
-  employer_match_dollar <- emp_match * salary
   salary <- salary * (1 + wagegrowth)
+  employer_match_dollar <- emp_match * salary
   bal_401k <- (current401k) * (1 + ratereturn) + (employer_match_dollar + emp_contrib)
   bal_roth <- (currentroth) * (1 + ratereturn) + (roth)
   bal_hsa <- (currenthsa) * (1 + ratereturn) + (hsa)
@@ -41,21 +41,24 @@ retirement.projection <- function(projection, starting_401k, starting_roth, star
   current_year <- as.numeric(format(Sys.Date(), "%Y"))
   
   df <- data.frame(
-    Year = rep(0, projection),
-    Age = rep(0, projection),
-    Salary = rep(0, projection),
-    Employer_Contrib = rep(0, projection),
-    Employee_Contrib = rep(0, projection),
-    Roth = rep(0, projection),
-    HSA = rep(0, projection), 
-    Bal_401k = rep(0, projection),
-    Balance = rep(0, projection)
+    Year = rep(0, projection + 1),
+    Age = rep(0, projection + 1),
+    Salary = rep(0, projection + 1),
+    Employer_Contrib = rep(0, projection + 1),
+    Employee_Contrib = rep(0, projection + 1),
+    Roth = rep(0, projection + 1),
+    HSA = rep(0, projection + 1), 
+    Bal_401k = rep(0, projection + 1),
+    Balance = rep(0, projection + 1)
   )
   
-  df[1, ] <- retirement.growth(age - 1, 0, employer_match, employee_contrib, rate_of_return, roth_contrib, hsa_contrib, current_year - 1,
+  df[1, ] <- retirement.growth(age - 2, 0, 0, 0, 0, 0, 0, current_year - 2,
+                               starting_401k, starting_roth, starting_hsa, 0) 
+  
+  df[2, ] <- retirement.growth(age - 1, 0, employer_match, employee_contrib, rate_of_return, roth_contrib, hsa_contrib, current_year - 1,
                               starting_401k, starting_roth, starting_hsa, starting_salary) 
   
-  for( i in 2:projection) {
+  for( i in 3:(projection + 1)) {
     df[i, ] <- retirement.growth(
       df[i-1, "Age"],
       wage_growth,
