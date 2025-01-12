@@ -8,8 +8,9 @@
 
 # budgetfunc.R
 
-budget.output <- function(take_home, rent_mort,car_payment, groceries, home_ins, home_maint, car_ins, car_maint, 
-                          utilities, subscriptions, dining_out, hobbies, savings, investing) {
+budget.output <- function(take_home, rent_mort,car_payment, groceries, home_ins,
+                          home_maint, car_ins, car_maint, utilities, subscriptions,
+                          dining_out, hobbies, savings, investing) {
   
   total <- take_home
   Needs <- rent_mort + car_payment + groceries + home_ins + home_maint + car_ins + car_maint + utilities

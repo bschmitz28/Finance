@@ -9,7 +9,7 @@ source("packages.R") # Load packages
 
 # height of figures
 figure.height <- '600px'
-loading.spinner.color <<- '#82DA9F'
+loading.spinner.color <<- "#6f42c1"
 
 # UI Definition ----
 shinyUI(
@@ -90,7 +90,19 @@ shinyUI(
       .modal-dialog {
         width: fit-content !important;
       }
-
+      
+   /* Custom Spinner */
+      #loading_spinner {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 30px;
+        color: ", loading.spinner.color, ";  /* Inject R variable here */
+        z-index: 9999;
+      }
+        
       #p1_age-label,
       #p1_salary-label,
       #p1_wagegrowth-label,
@@ -139,7 +151,12 @@ shinyUI(
         border-right: 2px solid white; /* Adjust color if needed */
       }
     "))  # End of tags$style
-      ),  # End of tags$head,
+      ),  # End of tags$head
+      
+      div(id = "loading_spinner", 
+          tags$span(class = "fa fa-spinner fa-spin", style = "font-size: 50px;")),
+      
+      
       # Tabs for 3 sections ----
       tabItems(
         # Budget Quick Look Tab ----

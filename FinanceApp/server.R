@@ -113,7 +113,7 @@ function(input, output, session) {
   
   # Reactive expression to create the dataframe based on reactive values for retirement growth
   projected_data <- reactive({
-
+    
     
     if(input$household_count == "One Person") {
       
@@ -137,13 +137,13 @@ function(input, output, session) {
       names(temp_df1)[2:10] <- paste("p1_", names(temp_df1)[2:10], sep ="")
       names(temp_df2)[2:10] <- paste("p2_", names(temp_df2)[2:10], sep ="")
       df <- full_join(temp_df1, temp_df2, by = "Year") #need for taking larger of the two projected years in df (ie someone 24 years and someone 25)
-     
-       # case for nrows(p1) and p2 not equal length
+      
+      # case for nrows(p1) and p2 not equal length
       for(i in 2:nrow(df)) {
-       df[i, "p1_Balance"] <-if_else(is.na(df[i,"p1_Balance"]), df[i-1, "p1_Balance"], df[i, "p1_Balance"]) 
-       df[i, "p2_Balance"] <-if_else(is.na(df[i,"p2_Balance"]), df[i-1, "p2_Balance"], df[i, "p2_Balance"]) 
+        df[i, "p1_Balance"] <-if_else(is.na(df[i,"p1_Balance"]), df[i-1, "p1_Balance"], df[i, "p1_Balance"]) 
+        df[i, "p2_Balance"] <-if_else(is.na(df[i,"p2_Balance"]), df[i-1, "p2_Balance"], df[i, "p2_Balance"]) 
       }
-
+      
       df$`Total Balance` <- df$p1_Balance + df$p2_Balance
       
       df[,c(3:10, 12:20)] <- lapply(df[,c(3:10, 12:20)], dollar,accuracy = 0.01)
@@ -207,10 +207,12 @@ function(input, output, session) {
   
   # Reactive expression to create dataframe based on reactive values for budget
   budget_data <- reactive({
-    df <- budget.output(rv$take_home,rv$rent_mort,rv$car_payment, rv$groceries, rv$home_ins, rv$home_maint, rv$car_ins, rv$car_maint, rv$utilities, rv$subscriptions, 
+    df <- budget.output(rv$take_home,rv$rent_mort,rv$car_payment, rv$groceries, rv$home_ins,
+                        rv$home_maint, rv$car_ins, rv$car_maint, rv$utilities, rv$subscriptions, 
                         rv$dining_out, rv$hobbies, rv$savings,  rv$investing)
   })  
-# Budget outputs ----
+  
+  # Budget outputs ----
   # Reactive expression for pie chart data
   reactivePieData <- eventReactive(input$budgetbtn, {
     list(
@@ -325,18 +327,50 @@ function(input, output, session) {
       )
   })
   
-  # Reactive expression for note output
-  reactiveNoteOutput <- eventReactive(input$budgetbtn, {
-    div("This is following the 50/30/20 principle. It is advised to have 'Needs' less than or equal to 50%, 'Wants' less than or equal to 30%, and 'Savings/Investing' greater than or equal to 20%.", 
-        style = "font-size:14px; color: gray; padding: 10px;")
-  })
-  # TODO: make a conditional note for if unallocated > 0, a note with 'you have x dollars surplus unallocated' and if unallocated < 0, 'you are over spending $x amount'
   
+  
+  # Budget Note Output
+  
+  unallocated <- reactive({
+    budget_data()$Unallocated
+  })
+  # Reactive expression to create the note output
+  reactiveNoteOutput <- eventReactive(input$budgetbtn, {
+    unallocated_value <- unallocated()
+    
+    # Create the general 50/30/20 principle note
+    principle_note <- div(
+      "This is following the 50/30/20 principle. It is advised to have 'Needs' less than or equal to 50%, 'Wants' less than or equal to 30%, and 'Savings/Investing' greater than or equal to 20%.", 
+      style = "font-size:14px; color: gray; padding: 10px;"
+    )
+    
+    # Generate conditional note based on unallocated value
+    conditional_note <- if (unallocated_value > 0) {
+      div(
+        sprintf("You have $%0.2f surplus unallocated.", unallocated_value),
+        style = "font-size:14px; color: green; padding: 10px;"
+      )
+    } else if (unallocated_value < 0) {
+      div(
+        sprintf("You are overspending by $%0.2f.", abs(unallocated_value)),
+        style = "font-size:14px; color: red; padding: 10px;"
+      )
+    } else {
+      div(
+        "Your budget is perfectly allocated with no surplus or deficit.",
+        style = "font-size:14px; color: gray; padding: 10px;"
+      )
+    }
+    
+    # Combine both notes into one output
+    tagList(principle_note, conditional_note)
+  })
   # Render the note output
   output$noteOutput <- renderUI({
     reactiveNoteOutput()
   })
-# Investment Editable DT ----
+  
+  # Investment Editable DT ----
   
   # Reactive values to hold the investment table
   investments <- reactiveVal(data.frame(
@@ -411,9 +445,11 @@ function(input, output, session) {
         color = styleInterval(0, c('#ff4d4d', '#91cf60'))
       )
   })
-
+  
   # Run analysis button
   observeEvent(input$investbtn, {
+    
+    shinyjs::show("loading_spinner")
     temp_tbl = investments()
     
     #create a for loop going through each of my 'investments' in temp tbl. as it goes through, assign it as new("Investment")
@@ -443,14 +479,14 @@ function(input, output, session) {
     output_tbl <- returnPortfolioManagerTable(temp_pm)
     names(output_tbl) <- names(temp_tbl)
     
-    #print(temp_tbl)
-    #print(output_tbl)
+    shinyjs::hide("loading_spinner")
+    
     investments(output_tbl)
   })
   
   
-
-# Retirement Growth Plot ----
+  
+  # Retirement Growth Plot ----
   # Reactive expression for retirement growth plot data
   reactiveGrowthPlotData <- eventReactive(input$growthplotbtn, {
     data <- projected_data()  # Get the reactive data frame
