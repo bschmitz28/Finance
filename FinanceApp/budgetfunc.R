@@ -8,11 +8,11 @@
 
 # budgetfunc.R
 
-budget.output <- function(take_home, rent_mort, groceries, home_ins, home_maint, car_ins, car_maint, 
+budget.output <- function(take_home, rent_mort,car_payment, groceries, home_ins, home_maint, car_ins, car_maint, 
                           utilities, subscriptions, dining_out, hobbies, savings, investing) {
   
   total <- take_home
-  Needs <- rent_mort + groceries + home_ins + home_maint + car_ins + car_maint + utilities
+  Needs <- rent_mort + car_payment + groceries + home_ins + home_maint + car_ins + car_maint + utilities
   Needs_Perc <- round((Needs/total)*100, 2)
   Wants <- subscriptions + dining_out + hobbies
   Wants_Perc <- round((Wants/total)*100, 2)
@@ -23,7 +23,8 @@ budget.output <- function(take_home, rent_mort, groceries, home_ins, home_maint,
   
   df <- data.frame(
     'Take_Home' = take_home,
-    'Rent_Mortgage' = rent_mort, 
+    'Rent_Mortgage' = rent_mort,
+    'Car_Payment' = car_payment,
     'Groceries' = groceries,
     'Home_Renters_Insurance' = home_ins,
     'Home_Maintenance' = home_maint, 

@@ -3,7 +3,6 @@
 # Author: Rosie Schmitz
 
 # Preamble ----
-library(shiny)
 source("global.R") # Load global variables
 source("budgetfunc.R") # Compute budget outputs for pie chart and table
 source("investfunc.R") # Compute investment outputs for DT tbl
@@ -17,6 +16,7 @@ function(input, output, session) {
     # budget 
     take_home = 0,
     rent_mort = 0,
+    car_payment = 0,
     groceries = 0, 
     home_ins = 0,
     home_maint = 0,
@@ -38,20 +38,24 @@ function(input, output, session) {
     p1_emp_contrib = 0,
     p1_ratereturn = 0,
     p1_roth = 0,
+    p1_brokerage = 0,
     p1_hsa = 0,
     p1_projections = 0,
     p1_current401k = 0,
     p1_currentroth = 0,
+    p1_currentbrokerage = 0,
     p1_currenthsa = 0,
     p1_salary = 0,
     p2_wagegrowth = 0,
     p2_emp_contrib = 0,
     p2_ratereturn = 0,
     p2_roth = 0,
+    p2_brokerage = 0,
     p2_hsa = 0,
     p2_projections = 0,
     p2_current401k = 0,
     p2_currentroth = 0,
+    p2_currentbrokerage = 0,
     p2_currenthsa = 0,
     p2_salary = 0,
     household_count = "One Person",
@@ -60,6 +64,7 @@ function(input, output, session) {
     # budget
     rv$take_home     <- input$take_home
     rv$rent_mort     <- input$rent_mort
+    rv$car_payment   <- input$car_payment
     rv$groceries     <- input$groceries
     rv$home_ins      <- input$home_ins
     rv$home_maint    <- input$car_maint
@@ -73,53 +78,64 @@ function(input, output, session) {
     rv$investing     <- input$investing
   })
   observe({
-    #investment
-    rv$p1_age          <- input$p1_age
-    rv$p2_age          <- input$p2_age
-    rv$p1_wagegrowth   <- input$p1_wagegrowth
-    rv$p1_emp_match    <- input$p1_emp_match
-    rv$p1_emp_contrib  <- input$p1_emp_contrib
-    rv$p1_ratereturn   <- input$p1_ratereturn 
-    rv$p1_roth         <- input$p1_roth
-    rv$p1_hsa          <- input$p1_hsa
-    rv$p1_projections  <- input$p1_projections
-    rv$p1_current401k  <- input$p1_current401k
-    rv$p1_currentroth  <- input$p1_currentroth
-    rv$p1_currenthsa   <- input$p1_currenthsa
-    rv$p1_salary       <- input$p1_salary
-    rv$p2_wagegrowth   <- input$p2_wagegrowth
-    rv$p2_emp_match    <- input$p2_emp_match
-    rv$p2_emp_contrib  <- input$p2_emp_contrib
-    rv$p2_ratereturn   <- input$p2_ratereturn
-    rv$p2_roth         <- input$p2_roth
-    rv$p2_hsa          <- input$p2_hsa
-    rv$p2_projections  <- input$p2_projections
-    rv$p2_current401k  <- input$p2_current401k
-    rv$p2_currentroth  <- input$p2_currentroth
-    rv$p2_currenthsa   <- input$p2_currenthsa
-    rv$p2_salary       <- input$p2_salary
-    rv$household_count <- input$household_count
+    # investment
+    rv$p1_age              <- input$p1_age
+    rv$p2_age              <- input$p2_age
+    rv$p1_wagegrowth       <- input$p1_wagegrowth
+    rv$p1_emp_match        <- input$p1_emp_match
+    rv$p1_emp_contrib      <- input$p1_emp_contrib
+    rv$p1_ratereturn       <- input$p1_ratereturn 
+    rv$p1_roth             <- input$p1_roth
+    rv$p1_brokerage        <- input$p1_brokerage
+    rv$p1_hsa              <- input$p1_hsa
+    rv$p1_projections      <- input$p1_projections
+    rv$p1_current401k      <- input$p1_current401k
+    rv$p1_currentroth      <- input$p1_currentroth
+    rv$p1_currentbrokerage <- input$p1_currentbrokerage
+    rv$p1_currenthsa       <- input$p1_currenthsa
+    rv$p1_salary           <- input$p1_salary
+    rv$p2_wagegrowth       <- input$p2_wagegrowth
+    rv$p2_emp_match        <- input$p2_emp_match
+    rv$p2_emp_contrib      <- input$p2_emp_contrib
+    rv$p2_ratereturn       <- input$p2_ratereturn
+    rv$p2_roth             <- input$p2_roth
+    rv$p2_brokerage        <- input$p2_brokerage
+    rv$p2_hsa              <- input$p2_hsa
+    rv$p2_projections      <- input$p2_projections
+    rv$p2_current401k      <- input$p2_current401k
+    rv$p2_currentroth      <- input$p2_currentroth
+    rv$p2_currentbrokerage <- input$p2_currentbrokerage
+    rv$p2_currenthsa       <- input$p2_currenthsa
+    rv$p2_salary           <- input$p2_salary
+    rv$household_count     <- input$household_count
   })
   
   
   # Reactive expression to create the dataframe based on reactive values for retirement growth
   projected_data <- reactive({
+
     
     if(input$household_count == "One Person") {
       
-      df <- retirement.projection(rv$p1_projections, rv$p1_current401k,  rv$p1_currentroth, rv$p1_currenthsa, rv$p1_salary, rv$p1_wagegrowth, rv$p1_ratereturn,
-                                  rv$p1_age, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_roth, rv$p1_hsa)
-      df[,3:9] <- lapply(df[,3:9], dollar,accuracy = 0.01)
+      df <- retirement.projection(rv$p1_projections, rv$p1_current401k,  rv$p1_currentroth,rv$p1_currentbrokerage, rv$p1_currenthsa,
+                                  rv$p1_salary, rv$p1_wagegrowth, rv$p1_ratereturn,
+                                  rv$p1_age, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_roth, rv$p1_brokerage, rv$p1_hsa)
+      
+      df[,3:10] <- lapply(df[,3:10], dollar,accuracy = 0.01)
+      
       df
       
     } else {
-      temp_df1 <- retirement.projection(rv$p1_projections, rv$p1_current401k,  rv$p1_currentroth, rv$p1_currenthsa, rv$p1_salary, rv$p1_wagegrowth, rv$p1_ratereturn,
-                                        rv$p1_age, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_roth, rv$p1_hsa)
-      temp_df2 <- retirement.projection(rv$p2_projections, rv$p2_current401k,  rv$p2_currentroth, rv$p2_currenthsa, rv$p2_salary, rv$p2_wagegrowth, rv$p2_ratereturn,
-                                        rv$p2_age, rv$p2_emp_match, rv$p2_emp_contrib, rv$p2_roth, rv$p2_hsa)
+      temp_df1 <- retirement.projection(rv$p1_projections, rv$p1_current401k,  rv$p1_currentroth, rv$p1_currentbrokerage, rv$p1_currenthsa,
+                                        rv$p1_salary, rv$p1_wagegrowth, rv$p1_ratereturn,
+                                        rv$p1_age, rv$p1_emp_match, rv$p1_emp_contrib, rv$p1_roth, rv$p1_brokerage, rv$p1_hsa)
       
-      names(temp_df1)[2:9] <- paste("p1_", names(temp_df1)[2:9], sep ="")
-      names(temp_df2)[2:9] <- paste("p2_", names(temp_df2)[2:9], sep ="")
+      temp_df2 <- retirement.projection(rv$p2_projections, rv$p2_current401k,  rv$p2_currentroth, rv$p2_currentbrokerage, rv$p2_currenthsa,
+                                        rv$p2_salary, rv$p2_wagegrowth, rv$p2_ratereturn,
+                                        rv$p2_age, rv$p2_emp_match, rv$p2_emp_contrib, rv$p2_roth, rv$p2_brokerage, rv$p2_hsa)
+      
+      names(temp_df1)[2:10] <- paste("p1_", names(temp_df1)[2:10], sep ="")
+      names(temp_df2)[2:10] <- paste("p2_", names(temp_df2)[2:10], sep ="")
       df <- full_join(temp_df1, temp_df2, by = "Year") #need for taking larger of the two projected years in df (ie someone 24 years and someone 25)
      
        # case for nrows(p1) and p2 not equal length
@@ -129,7 +145,8 @@ function(input, output, session) {
       }
 
       df$`Total Balance` <- df$p1_Balance + df$p2_Balance
-      df[,c(3:9, 11:18)] <- lapply(df[,c(3:9, 11:18)], dollar,accuracy = 0.01)
+      
+      df[,c(3:10, 12:20)] <- lapply(df[,c(3:10, 12:20)], dollar,accuracy = 0.01)
       
       df
       
@@ -190,7 +207,7 @@ function(input, output, session) {
   
   # Reactive expression to create dataframe based on reactive values for budget
   budget_data <- reactive({
-    df <- budget.output(rv$take_home,rv$rent_mort, rv$groceries, rv$home_ins, rv$home_maint, rv$car_ins, rv$car_maint, rv$utilities, rv$subscriptions, 
+    df <- budget.output(rv$take_home,rv$rent_mort,rv$car_payment, rv$groceries, rv$home_ins, rv$home_maint, rv$car_ins, rv$car_maint, rv$utilities, rv$subscriptions, 
                         rv$dining_out, rv$hobbies, rv$savings,  rv$investing)
   })  
 # Budget outputs ----

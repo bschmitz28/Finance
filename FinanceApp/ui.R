@@ -5,8 +5,7 @@
 # Preamble ----
 source("global.R") # Load global variables
 source("packages.R") # Load packages
-packages <- packages()
-lapply(packages, library, character.only = TRUE)
+
 
 # height of figures
 figure.height <- '600px'
@@ -54,7 +53,7 @@ shinyUI(
         ),
         
         menuItem(
-          'Investment Breakdown',
+          'Investment Diversification',
           tabName = 'investmentTab',
           icon = icon('money-bill-trend-up')
         ),
@@ -99,6 +98,7 @@ shinyUI(
       #p1_emp_contrib-label,
       #p1_ratereturn-label,
       #p1_roth-label,
+      #p1_brokerage-label,
       #p1_hsa-label,
       #p1_projections-label,
       #p2_age-label,
@@ -108,13 +108,16 @@ shinyUI(
       #p2_emp_contrib-label, 
       #p2_ratereturn-label, 
       #p2_roth-label, 
+      #p2_brokerage-label,
       #p2_hsa-label, 
       #p2_projections-label,
       #p1_current401k-label, 
-      #p1_currentroth-label, 
+      #p1_currentroth-label,
+      #p1_currentbrokerage-label,
       #p1_currenthsa-label,
       #p2_current401k-label,
       #p2_currentroth-label,
+      #p2_currentbrokerage-label,
       #p2_currenthsa-label {
         font-size: 0.75em;
       }
@@ -145,14 +148,14 @@ shinyUI(
           h2('Budget Quick Look'),
           infoBox(
             title = "Welcome to the Finance App",
-            value = "Please use the inputs page to fill in household expenses. Next, view Budget Analysis to see graphs",
+            value = "Please use the inputs page to fill in monthly household expenses. Next, view Budget Analysis to see graphs",
             icon = icon('chart-pie'),
             color = "blue",
             fill = F, 
             width = 12
           ), # End of info box
           
-          # Budget tab panels ----
+          # Budget tab panels
           tabBox(
             title = "Budget",
             width = 12,
@@ -163,7 +166,7 @@ shinyUI(
                        numericInput(
                          inputId = "take_home",
                          label = "Total Take Home ($):",
-                         value = 6000,
+                         value = 5000,
                          min = 0,
                          max = 20000,
                          step = 10,
@@ -172,25 +175,34 @@ shinyUI(
                        numericInput(
                          inputId = "rent_mort",
                          label = "Rent/Mortgage ($):",
-                         value = 2093,
+                         value = 1300,
                          min = 0,
                          max = 5000,
-                         step = 10,
+                         step = 1,
+                         width = NA
+                       ),
+                       numericInput(
+                         inputId = "car_payment",
+                         label = "Car Payment ($):",
+                         value = 450,
+                         min = 0,
+                         max = 20000,
+                         step = 1,
                          width = NA
                        ),
                        numericInput(
                          inputId = "groceries",
                          label = "Groceries ($):",
-                         value = 700,
+                         value = 500,
                          min = 0,
-                         max = 2000,
+                         max = 10000,
                          step = 0.5,
                          width = NA
                        ),
                        numericInput(
                          inputId = "home_ins",
                          label = "Home/Renters Insurance ($):",
-                         value = 0,
+                         value = 100,
                          min = 0,
                          max = 500,
                          step = 5,
@@ -237,7 +249,7 @@ shinyUI(
                        numericInput(
                          inputId = "subscriptions",
                          label = "Subscriptions ($):",
-                         value = 45,
+                         value = 150,
                          min = 0,
                          max = 1000,
                          step = 5,
@@ -273,7 +285,7 @@ shinyUI(
                        numericInput(
                          inputId = "investing",
                          label = "Investing ($):",
-                         value = 2166,
+                         value = 1000,
                          min = 0,
                          max = 10000,
                          step = 10,
@@ -320,10 +332,10 @@ shinyUI(
           ) # End of tab box
         ), # End tab item
         
-        # Investment Breakdown Tab ----
+        # Investment Diversification Tab ----
         tabItem(
           tabName = 'investmentTab',
-          h2('Investment Breakdown'),
+          h2('Investment Diversification'),
           infoBox(
             title = "Welcome to the Finance App",
             value = "Please enter the inputs in the pink cells for your portfolio!",
@@ -408,22 +420,22 @@ shinyUI(
                        numericInput(
                          inputId = "p1_age",
                          label = "Person 1 Age:",
-                         value = 29,
+                         value = 25,
                          min = 18,
                          max = 120,
                          step = 1
                        ),
                        numericInput(
                          inputId = "p1_salary",
-                         label = "Person 1 Salary:",
-                         value = 80000,
+                         label = "Person 1 Salary ($):",
+                         value = 65000,
                          min = 1000,
                          max = 1000000,
                          step = 1
                        ),
                        numericInput(
                          inputId = "p1_wagegrowth",
-                         label = "Wage Growth Rate %:",
+                         label = "Wage Growth Rate (%):",
                          value = 3,
                          min = 0,
                          max = 100,
@@ -431,23 +443,23 @@ shinyUI(
                        ),
                        numericInput(
                          inputId = "p1_emp_match",
-                         label = "Employer Matching %:",
-                         value = 9,
+                         label = "Employer Matching (%):",
+                         value = 5,
                          min = 0,
                          max = 100,
                          step = 0.5
                        ),
                        numericInput(
                          inputId = "p1_emp_contrib",
-                         label = "401k Employee Contributions $:",
-                         value = 23000,
+                         label = "401k Employee Contributions ($):",
+                         value = 7000,
                          min = 0,
                          max = calculate_limits(75)$lim401k50,
                          step = 1
                        ),
                        numericInput(
                          inputId = "p1_ratereturn",
-                         label = "Rate of Return %:",
+                         label = "Rate of Return (%):",
                          value = 7,
                          min = 0,
                          max = 1000,
@@ -455,15 +467,23 @@ shinyUI(
                        ),
                        numericInput(
                          inputId = "p1_roth",
-                         label = "Annual Roth Contrib $:",
+                         label = "Annual Roth Contrib ($):",
                          value = 7000,
                          min = 0,
                          max = calculate_limits(75)$limrothira50,
                          step = 0.1
                        ),
                        numericInput(
+                         inputId = "p1_brokerage",
+                         label = "Annual Taxable Brokerage Contrib ($):",
+                         value = 2000,
+                         min = 0,
+                         max = 50000000,
+                         step = 0.1
+                       ),
+                       numericInput(
                          inputId = "p1_hsa",
-                         label = "Annual HSA Contrib $:",
+                         label = "Annual HSA Contrib ($):",
                          value = 0,
                          min = 0,
                          max = calculate_limits(75)$limhsaone55,
@@ -472,30 +492,38 @@ shinyUI(
                        numericInput(
                          inputId = "p1_projections",
                          label = "Years to Project:",
-                         value = 25,
+                         value = 30,
                          min = 0,
                          max = 100,
                          step = 1
                        ),
                        numericInput(
                          inputId = "p1_current401k",
-                         label = "Current 401k Amount:",
-                         value = 19750,
+                         label = "Current 401k Amount ($):",
+                         value = 0,
                          min = 0,
                          max = 10000000,
                          step = 0.1
                        ),
                        numericInput(
                          inputId = "p1_currentroth",
-                         label = "Current Roth Amount:",
-                         value = 39000,
+                         label = "Current Roth Amount ($):",
+                         value = 14000,
                          min = 0,
                          max = 10000000,
                          step = 0.1
                        ),
                        numericInput(
+                         inputId = "p1_currentbrokerage",
+                         label = "Current Taxable Brokerage Amount ($):",
+                         value = 10000,
+                         min = 0,
+                         max = 100000000,
+                         step = 0.1
+                       ),
+                       numericInput(
                          inputId = "p1_currenthsa",
-                         label = "Current HSA Amount:",
+                         label = "Current HSA Amount ($):",
                          value = 0,
                          min = 0,
                          max = 10000000,
@@ -513,46 +541,46 @@ shinyUI(
                          numericInput(
                            inputId = "p2_age",
                            label = "Person 2 Age:",
-                           value = 41,
+                           value = 32,
                            min = 18,
                            max = 120,
                            step = 1
                          ),
                          numericInput(
                            inputId = "p2_salary",
-                           label = "Person 2 Salary:",
-                           value = 88000,
+                           label = "Person 2 Salary ($):",
+                           value = 55000,
                            min = 1000,
                            max = 1000000,
                            step = 1
                          ),
                          numericInput(
                            inputId = "p2_wagegrowth",
-                           label = "Wage Growth Rate %:",
-                           value = 5,
+                           label = "Wage Growth Rate (%):",
+                           value = 3,
                            min = 0,
                            max = 100,
                            step = 0.5
                          ),
                          numericInput(
                            inputId = "p2_emp_match",
-                           label = "Employer Matching %:",
-                           value = 7,
+                           label = "Employer Matching (%):",
+                           value = 4.5,
                            min = 0,
                            max = 100,
                            step = 0.5
                          ),
                          numericInput(
                            inputId = "p2_emp_contrib",
-                           label = "401k Employee Contribution $:",
-                           value = 23000,
+                           label = "401k Employee Contribution ($):",
+                           value = 6000,
                            min = 0,
                            max = calculate_limits(75)$lim401k50,
                            step = 1
                          ),
                          numericInput(
                            inputId = "p2_ratereturn",
-                           label = "Rate of Return %:",
+                           label = "Rate of Return (%):",
                            value = 6,
                            min = 0,
                            max = 1000,
@@ -560,15 +588,23 @@ shinyUI(
                          ),
                          numericInput(
                            inputId = "p2_roth",
-                           label = "Annual Roth Contrib $:",
-                           value = 7000,
+                           label = "Annual Roth Contrib ($):",
+                           value = 5000,
                            min = 0,
                            max = calculate_limits(75)$limrothira50,
                            step = 0.1
                          ),
                          numericInput(
+                           inputId = "p2_brokerage",
+                           label = "Annual Taxable Brokerage Contrib ($):",
+                           value = 5000,
+                           min = 0,
+                           max = 50000000,
+                           step = 0.1
+                         ),
+                         numericInput(
                            inputId = "p2_hsa",
-                           label = "Annual HSA Contrib $:",
+                           label = "Annual HSA Contrib ($):",
                            value = 0,
                            min = 0,
                            max = calculate_limits(75)$limhsatwo55,
@@ -584,23 +620,31 @@ shinyUI(
                          ),
                          numericInput(
                            inputId = "p2_current401k",
-                           label = "Current 401k Amount:",
-                           value = 200400,
+                           label = "Current 401k Amount ($):",
+                           value = 30000,
                            min = 0,
                            max = 10000000,
                            step = 0.1
                          ),
                          numericInput(
                            inputId = "p2_currentroth",
-                           label = "Current Roth Amount:",
-                           value = 12600,
+                           label = "Current Roth Amount ($):",
+                           value = 14000,
                            min = 0,
                            max = 10000000,
                            step = 0.1
                          ),
                          numericInput(
+                           inputId = "p2_currentbrokerage",
+                           label = "Current Taxable Brokerage Amount ($):",
+                           value = 8000,
+                           min = 0,
+                           max = 100000000,
+                           step = 0.1
+                         ),
+                         numericInput(
                            inputId = "p2_currenthsa",
-                           label = "Current HSA Amount:",
+                           label = "Current HSA Amount ($):",
                            value = 0,
                            min = 0,
                            max = 10000000,
